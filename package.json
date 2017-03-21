@@ -1,0 +1,15 @@
+{
+  "name": "cli-project-manager",
+  "version": "0.1.0",
+  "description": "A simple but effective PM for your CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Lorenz <info@activenode>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "os-homedir": "^1.0.2"
+  }
+}

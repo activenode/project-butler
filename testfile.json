@@ -1,0 +1,12 @@
+{
+    "_settings": {
+        "_i": 0
+    },
+    "projects": {
+        "quickRef": {
+            "cores:/full/path/to/dir": {
+                "aliases": ["cr"]
+            }
+        }
+    }
+}
