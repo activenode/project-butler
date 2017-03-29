@@ -45,7 +45,7 @@ ensureFSExistence(managerDataFile, (path) => { fs.closeSync(fs.openSync(path, 'w
 //----------------------------------------
 
 const fileIO        = io.open(managerDataFile);
-const db            = Database(fileIO);
+const db            = Database(fileIO, path.sep);
 
 // cli.version("0.0.1")
 //   .option("-H, --host <host>", "server host")
@@ -55,17 +55,16 @@ const db            = Database(fileIO);
 cli.version('0.1.0').usage("[options] [command]");
 
 cli
-    .option('-d, --dir [path]', 'Directory to add - if not given, CWD will be used')
-    .command('add [options] [aliases...]')
+    .command('add [aliases...]')
+    .option('-d, --dir [path]', 'Directory to add. Default: CWD')
     .alias('a')
     .description('Adds current directory.')
-    .action((options, aliases) => {
-        const absPath           = path.resolve(cli.dir || getCWD());
-        const directoryName     = absPath.split(path.sep).pop();
+    .action((aliases) => {
+        const absPath = path.resolve(cli.dir || getCWD());
 
-        db.addProject(absPath, directoryName, aliases)
+        db.addProject(absPath, aliases)
             .then(res=>{
-                console.log('added');
+                //console.log('added');
             })
     });
 
@@ -79,7 +78,7 @@ cli.command('*')
 
 const args = cli.parse(process.argv).args;
 if (!args || args.length == 0) {
-    console.log('TODO: list all');
+    db.debug();
 }
 
 // console.log('the-args', cli.args);
