@@ -22,7 +22,6 @@ class Database {
         // await this.lastRead;
         this.lastRead.then(_=>{
             log('-------------------');
-            log('-------------------');
             this.aliasesToIndex.forEach((key, value)=>{
                 log(`Alias [${value}] mapped to ${this.indexToProject.get(key).absPath}`);
             })
@@ -91,6 +90,10 @@ class Database {
     }
 
     findBestMatch(searchString) {
+        //examples:
+        // 1. search string: emb 
+        // -> result: test-emb-test/ from absPath mapping should be matched.
+        // -> if multiple matches are available then list and ask to specify term
         throw new Error('NotYetImplemented');
     }
 
@@ -109,6 +112,11 @@ class Database {
         // console.log('aliases', aliases);
 
         return this.lastRead.then(obj=>{
+            if (obj.projects.quickRef[uid]) {
+                console.log(' ');
+                console.log('--- Info: Project already exists, will merge the definitions now. ---');
+            }
+
             obj.projects.quickRef[uid] = { "aliases": aliases };
             return obj;
         }).then(data=>this.parseData(data))

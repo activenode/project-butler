@@ -73,6 +73,10 @@ cli.command('*')
     .action((project) => {
         if (cli.args.length == 2) {
             console.log('pr', cli.args[0]);
+            db.matchProjectByLazyString(cli.args[0])
+                .then(resultObj=>{
+                    
+                })
         }
     });
 
@@ -82,3 +86,8 @@ if (!args || args.length == 0) {
 }
 
 // console.log('the-args', cli.args);
+
+
+//TODO: p update-aliases emb emb1 emb2 --> will overwrite the first match of emb with aliases emb1 and emb2 which means :
+// only emb1 and emb2 will be left.
+//other option: p -d /some add newaliases
