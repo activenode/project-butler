@@ -1,7 +1,13 @@
+const { 
+    Result,
+    ResultMatch,
+    ProposalMatch
+} = require('./structs');
 const EMPTY_STRUCT      = { 'projects': {quickRef: {}}, '_settings': { '_i' : 0 } };
 const PATH_DELIMITER    = ':';
 let log                 = function(){console.log(Array.from(arguments))};
 log.json                = _logdata=>log(JSON.stringify(_logdata));
+
 
 
 class Database {
@@ -16,6 +22,7 @@ class Database {
         this.indexToProject = new Map(); //only for back-reference of quick-access
         this.aliasesToIndex = new Map();
         this.absPathToIndex = new Map();
+        this.uidToIndex     = new Map();
     }
 
     debug() {
@@ -61,6 +68,13 @@ class Database {
         return this.lastRead;
     }
 
+    safeCall(func) {
+        if (!this.lastRead) {
+            this.load();
+        }
+        return this.lastRead.then(func);
+    }
+
     /**
      * @description generates unique Id by absPath and directoryName
      * @param {String} absPath
@@ -76,17 +90,34 @@ class Database {
      * @param {Object} dataStruct 
      */
     parseData ( dataStruct ) {
-        Object.keys(dataStruct.projects.quickRef).forEach((projectKey, index)=>{
-            const [directoryName, absPath] = projectKey.split(PATH_DELIMITER);
+        Object.keys(dataStruct.projects.quickRef).forEach((uid, index)=>{
+            const [directoryName, absPath] = uid.split(PATH_DELIMITER);
             this.indexToProject.set(index, {
                 absPath: absPath,
                 directoryName: directoryName
             });
 
+            this.uidToIndex.set(uid, index);
             this.absPathToIndex.set(absPath, index);
-            dataStruct.projects.quickRef[projectKey].aliases.forEach(alias=>this.aliasesToIndex.set(alias, index));
+            dataStruct.projects.quickRef[uid].aliases.forEach(alias=>this.aliasesToIndex.set(alias, index));
         })
-        return dataStruct;
+        return Promise.resolve(dataStruct);
+    }
+
+    /**
+     * @description Will return all project-related data via uid of the project
+     * @return {Promise<Object>} 
+     */
+    getProjectDetailsByUID(uid) {
+        return this.safeCall(({projects: {quickRef}})=>{
+            let projectData = this.indexToProject.get(this.uidToIndex.get(uid));
+            projectData.aliases =  quickRef[uid].aliases;
+            return projectData;
+        })
+    }
+
+    findNextBestMatch(searchString) {
+        return new ProposalMatch();
     }
 
     findBestMatch(searchString) {
@@ -94,7 +125,13 @@ class Database {
         // 1. search string: emb 
         // -> result: test-emb-test/ from absPath mapping should be matched.
         // -> if multiple matches are available then list and ask to specify term
-        throw new Error('NotYetImplemented');
+        return this.safeCall(_=>{
+            if (this.aliasesToIndex.has(searchString)) {
+                return new ResultMatch(this.indexToProject.get(this.aliasesToIndex.get(searchString)));
+            }
+
+            return this.findNextBestMatch(searchString);
+        });
     }
 
     /**
@@ -107,22 +144,26 @@ class Database {
         const directoryName = absPath.split(this.pathSeparator).pop();
         const uid = this.uid(absPath, directoryName);
 
-        // console.log('path', absPath);
-        // console.log('directoryName', directoryName);
-        // console.log('aliases', aliases);
+        const result = new Result();
 
         return this.lastRead.then(obj=>{
+            let aliasesToWrite = [].concat(obj.projects.quickRef[uid].aliases);
             if (obj.projects.quickRef[uid]) {
-                console.log(' ');
-                console.log('--- Info: Project already exists, will merge the definitions now. ---');
+                result.addWarning('Info: Project already exists, will merge the definitions now.');
+
+                aliases.forEach(alias=>{
+                    if (!aliasesToWrite.includes(alias)) {
+                        aliasesToWrite.push(alias);
+                    }
+                }) 
             }
 
-            obj.projects.quickRef[uid] = { "aliases": aliases };
-            return obj;
-        }).then(data=>this.parseData(data))
-        .then(this.save());
-        // .then(log.json).then(()=>this.debug());
-        
+            obj.projects.quickRef[uid] = { "aliases": aliasesToWrite };
+            return this.parseData(obj)
+                .then(this.save())
+                .then(()=>this.getProjectDetailsByUID(uid))
+                .then(projectDetails=>result.setResultData(projectDetails));
+        })
     }
 
     
