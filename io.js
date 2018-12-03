@@ -1,6 +1,10 @@
 const   fs  = require('fs'),
         u   = undefined;
 
+/**
+ * A function that provides a read, write and close function for a given filepath
+ * @return {Object} with read, write, close methods
+ */
 function readWriteHelper ( filePath ) {
     return {
         read: ()=>{

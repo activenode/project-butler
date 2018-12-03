@@ -1,0 +1,111 @@
+/**
+ * @class Result (!abstract!)
+ * Defines a database basic result
+ */
+class Result {
+    constructor(){
+        this.messages = {
+            'info': [],
+            'error': [],
+            'warn': []
+        };
+        this.resultData = null;
+    }
+
+    isError() {
+        return false;
+    }
+
+    data() {
+        return this.resultData;
+    }
+}
+
+class AddedResult extends Result {
+    constructor() {
+        super();
+    }
+
+    hasWarnings() {
+        return this.messages.warn.length > 0;
+    }
+
+    addWarning(text) {
+        this.messages.warn.push({text: text});
+    }
+
+    saveProjectDetails(projectDetails) {
+        this.resultData = projectDetails;
+        return this;
+    }
+}
+
+/**
+ * Represents an error as result
+ */
+class ErrorResult extends Result {
+    constructor() {
+        super();
+    }
+
+    isError() {
+        return true;
+    }
+
+    getErrors() {
+        return this.messages.error;
+    }
+
+    addError(text, childMessages) {
+        if (arguments.length===1) {
+            this.messages.error.push({text: text});
+        } else {
+            childMessages = childMessages && !Array.isArray(childMessages) ? [childMessages] : childMessages;
+            this.messages.error.push({text: text, childMessages: childMessages});
+        }
+
+        return this;
+    }
+}
+
+class ExactProjectResult extends Result {
+    /**
+     * @param {Object} project - the project details object
+     */
+    constructor(project) {
+        super();
+        this.resultData = project; /** { absPath: string, directoryName: string} */
+    }
+
+    getPath() {
+        return this.data().absPath;
+    }
+}
+
+class ProjectListResult extends Result {
+    /**
+     * @param {Array<Object>} listOfProjects
+     */
+    constructor(listOfProjects) {
+        super();
+        this.resultData = listOfProjects;
+    }
+}
+
+class ProjectProposalResult extends ProjectListResult {
+    /**
+     * @param {Array<Object>} listOfProjects
+     * @param {String} searchString - The string the project proposals are based on
+     */
+    constructor (listOfProjects, searchString) {
+        super(listOfProjects);
+    }
+}
+
+module.exports = {
+    ErrorResult: ErrorResult,
+    ProjectListResult: ProjectListResult,
+    ProjectProposalResult: ProjectProposalResult,
+    ExactProjectResult: ExactProjectResult,
+    AddedResult: AddedResult,
+};

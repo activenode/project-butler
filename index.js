@@ -5,8 +5,8 @@ const cli = require('commander'),
     fs = require('fs'),
     path = require('path'),
     io = require('./io'),
-    Database = require('./database'),
-    shellify = require('./shell-helper.js'),
+    ProjectDatabase = require('./db/database'),
+    shellify = require('./shell/shellify'),
     getCWD = process.cwd;
 
 
@@ -19,8 +19,8 @@ const cli = require('commander'),
 
 
 const _self = {
-    name: 'clipm',
-    dataDir: '.clipmdata'
+    name: 'alclipm',
+    dataDir: '.alclipmdata'
 };
 const homedir = osHomedir();
 if (!homedir) {
@@ -55,7 +55,7 @@ ensureFSExistence(managerDataFile, (path) => { fs.closeSync(fs.openSync(path, 'w
 //----------------------------------------
 
 const fileIO        = io.open(managerDataFile);
-const db            = Database(fileIO, path.sep);
+const db            = ProjectDatabase(fileIO, path.sep);
 
 // cli.version("0.0.1")
 //   .option("-H, --host <host>", "server host")
@@ -63,6 +63,7 @@ const db            = Database(fileIO, path.sep);
 //   .action((inf)=>{})
 
 cli.version('0.1.0').usage("[options] [command]");
+
 
 cli
     .command('add [aliases...]')
@@ -83,7 +84,8 @@ cli.command('*')
 
 const args = cli.parse(process.argv).args;
 if (!args || args.length == 0) {
-    db.debug();
+    //db.debug();
+    db.fetchAll().then(shellify)
 }
 
 
