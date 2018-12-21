@@ -12,7 +12,7 @@ CLI Project Manager
 ```bash
 # needs to be in .bash_profile
 p () {
-  RESULT=$(/Users/david/dev/projects/cli-project-manager/index.js "$@")
+  RESULT=$(project-butler "$@")
   EXEC_TRY=$(eval $RESULT 2>&1)
 
   if [ "$?" -eq "0" ]; then
