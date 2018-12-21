@@ -1,20 +1,39 @@
 CLI Project Manager
 ============
 
-# Usage 
+# Installation
 
+## 1. Install package
+`npm -g install project-butler`
+
+## 2. Make it available in your Bash
+
+
+```bash
+# needs to be in .bash_profile
+p () {
+  RESULT=$(/Users/david/dev/projects/cli-project-manager/index.js "$@")
+  EXEC_TRY=$(eval $RESULT 2>&1)
+
+  if [ "$?" -eq "0" ]; then
+#   execution went fine
+    eval $RESULT
+  else
+    echo -e "$RESULT"
+  fi
+}
+```
+
+# Usage
 
 ```
 $ p [options] [COMMAND] [args]
 
 Commands:
-    p                                       | list available projects 
-    p add                                   | adds current directory to projects 
-    p o project-name                        | opens the given project
-    p [--no-hooks] o project-name                  | opens the given project whilst ignoring its entry hooks
+    p                 | list available projects
+    p add             | adds current directory to projects
+    p project-name    | opens the given project
+
+    p --help          | show help menu
 ```
 
-
-# Open Task 
-
-[ ] Make use of global ENV variable to allow setting base/root directory of cli pm

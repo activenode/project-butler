@@ -19,6 +19,10 @@ class Result {
     data() {
         return this.resultData;
     }
+
+    aliasesPreprocess(aliasesArray) {
+        return aliasesArray;
+    }
 }
 
 class AddedResult extends Result {
@@ -90,6 +94,27 @@ class ProjectListResult extends Result {
         super();
         this.resultData = listOfProjects;
     }
+
+    get title() {
+        return 'Available projects:';
+    }
+}
+
+class SearchProjectListResult extends ProjectListResult {
+    constructor(projectListResult, { searchString }) {
+        super(projectListResult.resultData);
+        this.searchString = searchString;
+    }
+
+    get title() {
+        return `Found multiple matches for '${this.searchString}', please specify:`;
+    }
+
+    aliasesPreprocess(aliasesArray) {
+        return aliasesArray.filter(sAlias => {
+            return sAlias.includes(this.searchString);
+        });
+    }
 }
 
 class ProjectProposalResult extends ProjectListResult {
@@ -105,6 +130,7 @@ class ProjectProposalResult extends ProjectListResult {
 module.exports = {
     ErrorResult: ErrorResult,
     ProjectListResult: ProjectListResult,
+    SearchProjectListResult: SearchProjectListResult,
     ProjectProposalResult: ProjectProposalResult,
     ExactProjectResult: ExactProjectResult,
     AddedResult: AddedResult,

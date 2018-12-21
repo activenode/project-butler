@@ -1,6 +1,7 @@
 const {
     ErrorResult,
     ProjectListResult,
+    SearchProjectListResult,
     ExactProjectResult,
     AddedResult,
 } = require('./structs');
@@ -9,10 +10,26 @@ log.json                = _logdata=>log(JSON.stringify(_logdata));
 const PATH_DELIMITER    = ':';
 const EMPTY_STRUCT      = { 'projects': {quickRef: {}}, '_settings': { '_i' : 0 } };
 
-function err(error) {
-    let errorResult =(new ErrorResult()).addError(error);
+function err(error, childMessages = []) {
+    let errorResult = (new ErrorResult()).addError(error, childMessages);
+    return errorResult;
 }
 
+function getKeysFromMap(m) {
+    return Array.from(m || new Map).map(keyValueArr => {
+        return keyValueArr[0];
+    });
+}
+
+function matchesInArray(searchString, arr) {
+    return arr.filter( value => {
+        if (value.replace(searchString, '') !== value) {
+            // contained it, return with TRUE
+            return true;
+        }
+        return false;
+    });
+}
 
 class ProjectDatabase {
     /**
@@ -30,11 +47,12 @@ class ProjectDatabase {
     }
 
     setupEmptyMaps() {
-        this.indexToProject = new Map(); 
+        this.indexToProject = new Map();
         //backmapping to indexes to reference projects
         this.aliasesToIndex = new Map();
         this.absPathToIndex = new Map();
         this.uidToIndex     = new Map();
+        this.indexToUid     = new Map();
     }
 
     /**
@@ -59,13 +77,13 @@ class ProjectDatabase {
 
     /**
      * Will fetch all available projects
-     * @return {Promise<ProjectListResult>} 
+     * @return {Promise<ProjectListResult>}
      */
-    async fetchAll() {
+    async fetchAll(uidsPrefiltered) {
         await (this.load());
-        const uids = Array.from(this.uidToIndex.keys());
-        return Promise.all(uids.map(uid=>this.getProjectDetailsByUID(uid)))
-            .then(projectDetailsArray=>new ProjectListResult(projectDetailsArray))
+        const uids = Array.isArray(uidsPrefiltered) ? uidsPrefiltered : Array.from(this.uidToIndex.keys());
+        return Promise.all(uids.map(uid => this.getProjectDetailsByUID(uid)))
+            .then(projectDetailsArray => new ProjectListResult(projectDetailsArray))
             .catch(err);
     }
 
@@ -76,7 +94,7 @@ class ProjectDatabase {
     save() {
         return (newDataObj)=>{
             return this.fileIO.write(JSON.stringify(newDataObj)).then(_=>{
-                //ensuring that access to lastRead will deal with the new data 
+                //ensuring that access to lastRead will deal with the new data
                 this.lastRead = Promise.resolve(newDataObj);  //-> instead of this.load() => perf+
                 return newDataObj
             })
@@ -84,7 +102,7 @@ class ProjectDatabase {
     }
 
     /**
-     * @description will read the file-contents and parse it to an object. 
+     * @description will read the file-contents and parse it to an object.
      * If no file contents are given it will provide an empty valid struct object.
      * @param {Boolean} bForceFileLoad - if true then a file io will be enforced
      * @return {Promise<String>}
@@ -112,11 +130,12 @@ class ProjectDatabase {
     }
 
     /**
-     * parseData will make sure that the project object 
+     * parseData will make sure that the project object
      * is mapped to the temporary storage and easily accessible.
-     * @param {Object} dataStruct 
+     * @param {Object} dataStruct
      */
     parseData ( dataStruct ) {
+        this.setupEmptyMaps();
         Object.keys(dataStruct.projects.quickRef).forEach((uid, index)=>{
             const [directoryName, absPath] = uid.split(PATH_DELIMITER);
             this.indexToProject.set(index, {
@@ -125,6 +144,7 @@ class ProjectDatabase {
             });
 
             this.uidToIndex.set(uid, index);
+            this.indexToUid.set(index, uid);
             this.absPathToIndex.set(absPath, index);
             dataStruct.projects.quickRef[uid].aliases.forEach(alias=>this.aliasesToIndex.set(alias, index));
         })
@@ -133,7 +153,7 @@ class ProjectDatabase {
 
     /**
      * @description Will return all project-related data via uid of the project
-     * @return {Promise<Object>} 
+     * @return {Promise<Object>}
      */
     async getProjectDetailsByUID(uid) {
         return this.load().then(({projects: {quickRef}})=>{
@@ -143,8 +163,63 @@ class ProjectDatabase {
         })
     }
 
+
+    getExactProjectResultByAlias(sAlias) {
+        return this.load().then(_ => {
+            return new ExactProjectResult(this.indexToProject.get(this.aliasesToIndex.get(sAlias)));
+        });
+    }
+
+    /**
+     * Will search for a best match. E.g. `cl` would match `cli` and return an exact
+     * but if there is `cli` and `cla` then it would just return Proposals
+     * @param {string} searchString
+     */
     findNextBestMatch(searchString) {
-        return new ProposalMatch();
+        return this.load().then(_=>{
+            const foundMatches = matchesInArray(searchString, getKeysFromMap(this.aliasesToIndex));
+
+            if (foundMatches.length === 0) {
+                return err(`No match found for '${searchString}'`);
+            } else if (foundMatches.length === 1) {
+                // well we got an exact result so lets go back to the old function :)
+                return this.getExactProjectResultByAlias(foundMatches[0]);
+            }
+            // else: lets return the found proposals
+
+            // but: if all found proposals (even if multiple) were pointing to the same directory
+            // => exact match!
+
+            const allFoundMatchesAsIndices = foundMatches.map(sAlias => {
+                return this.aliasesToIndex.get(sAlias);
+            });
+
+            const bAllMatchesPointToSame = allFoundMatchesAsIndices.every(index => {
+                return index === allFoundMatchesAsIndices[0];
+            });
+
+            if (bAllMatchesPointToSame) {
+                return this.getExactProjectResultByAlias(foundMatches[0]);
+            } // else: list all found occurences
+
+            // now we need to convert indices to uids as indices cannot be
+            // mapped to ProjectListResults
+            const uids = [];
+            allFoundMatchesAsIndices.forEach( iIndex => {
+                const uid = this.indexToUid.get(iIndex);
+                if (!uids.includes(uid)) {
+                    uids.push(uid);
+                }
+            });
+
+            return this.fetchAll(uids)
+                .then( projectListResult => {
+                    return new SearchProjectListResult(
+                        projectListResult,
+                        { searchString }
+                    )
+                });
+        });
     }
 
     findBestMatch(searchString) {
@@ -154,7 +229,7 @@ class ProjectDatabase {
         // -> if multiple matches are available then list and ask to specify term
         return this.load().then(_=>{
             if (this.aliasesToIndex.has(searchString)) {
-                return new ExactProjectResult(this.indexToProject.get(this.aliasesToIndex.get(searchString)));
+                return this.getExactProjectResultByAlias(searchString);
             }
 
             return this.findNextBestMatch(searchString);
@@ -185,21 +260,26 @@ class ProjectDatabase {
     }
 
     /**
-     * Adds a project with its aliases 
-     * @param {String} absPath 
-     * @param {Array<String>} aliases 
+     * Adds a project with its aliases
+     * @param {String} absPath
+     * @param {Array<String>} aliases
      */
     async addProject(absPath, aliases) {
         //addProject(..) will add directoryName as alias automatically if the alias is not yet occupied
         const directoryName = absPath.split(this.pathSeparator).pop();
         const uid = this.uid(absPath, directoryName);
 
+        if (!Array.isArray(aliases) || aliases.length === 0) {
+            aliases = [ directoryName ];
+        }
+        aliases = aliases.map(sAlias => sAlias.toLowerCase());
+
         const aliasesInUse = await this.mapExistingAliasesWithProjectDirs(aliases, {excludePath: absPath});
 
         if (aliasesInUse) {
             return (new ErrorResult())
                 .addError(
-                    `The following aliases are already in use`, 
+                    `The following aliases are already in use`,
                     aliasesInUse.map(aliasObj=>`${aliasObj.alias} => ${aliasObj.absPath}`)
                 );
         }
@@ -212,19 +292,90 @@ class ProjectDatabase {
             if (obj.projects.quickRef[uid]) {
                 result.addWarning('Info: Project already exists, will merge the definitions now.');
                 aliasesToWrite = [].concat(obj.projects.quickRef[uid].aliases)
-
-                aliases.forEach(alias=>{
-                    if (!aliasesToWrite.includes(alias)) {
-                        aliasesToWrite.push(alias);
-                    }
-                });
             }
+
+            aliases.forEach(alias=>{
+                if (!aliasesToWrite.includes(alias)) {
+                    aliasesToWrite.push(alias);
+                }
+            });
 
             obj.projects.quickRef[uid] = { "aliases": aliasesToWrite };
             return this.parseData(obj)
                 .then(this.save())
                 .then(()=>this.getProjectDetailsByUID(uid))
                 .then(projectDetails=>result.saveProjectDetails(projectDetails));
+        })
+    }
+
+    /**
+     * Remove aliases. Also removes project if a the boolean param is set to true
+     * @param {Array<String>} aliases
+     * @param {Boolean} bDeleteAll
+     */
+    async removeByAliases(aliases, bDeleteAll) {
+        return this.load().then(obj => {
+            const existingAliases = (Array.isArray(aliases) ? aliases : []).filter(sAlias => {
+                return this.aliasesToIndex.has(sAlias);
+            });
+
+            if (!existingAliases.length) {
+                return err('None of the given aliases could be found');
+            }
+
+            
+            const affectedUidsArr = Array.from(existingAliases.reduce((oSet, sAlias) => {
+                oSet.add(
+                    this.indexToUid.get(
+                        this.aliasesToIndex.get(sAlias)
+                    )
+                );
+
+                return oSet
+            }, new Set()));
+
+
+            affectedUidsArr.forEach(uid => {
+                if (obj.projects.quickRef[uid]) {
+                    if (bDeleteAll) {
+                        delete obj.projects.quickRef[uid];
+                    } else {
+                        // only remove the aliases given
+                        obj.projects.quickRef[uid].aliases = obj.projects.quickRef[uid].aliases.filter(sAlias => {
+                            return !existingAliases.includes(sAlias);
+                        });
+
+                        if (obj.projects.quickRef[uid].aliases.length === 0) {
+                            delete obj.projects.quickRef[uid];
+                        }
+                    }
+                }
+            });
+
+            return this.parseData(obj)
+                .then(this.save())
+                .then(()=>this.fetchAll());
+        });
+    }
+
+    /**
+     * Remove a project with its aliases by its directory
+     * @param {String} absPath
+     */
+    async removeByDirectory(absPath) {
+        //addProject(..) will add directoryName as alias automatically if the alias is not yet occupied
+        const directoryName = absPath.split(this.pathSeparator).pop();
+        const uid = this.uid(absPath, directoryName);
+
+        return this.load().then(obj => {
+            if (!obj.projects.quickRef[uid]) {
+                return err(`Directory '${absPath}' is not stored.`);
+            }
+
+            delete obj.projects.quickRef[uid];
+            return this.parseData(obj)
+                .then(this.save())
+                .then(()=>this.fetchAll());
         })
     }
 }

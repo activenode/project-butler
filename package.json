@@ -1,6 +1,6 @@
 {
-  "name": "cli-project-manager",
-  "version": "0.1.0",
+  "name": "project-butler",
+  "version": "0.2.0",
   "description": "A simple but effective PM for your CLI",
   "main": "index.js",
   "scripts": {

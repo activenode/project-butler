@@ -7,7 +7,8 @@ const cli = require('commander'),
     io = require('./io'),
     ProjectDatabase = require('./db/database'),
     shellify = require('./shell/shellify'),
-    getCWD = process.cwd;
+    getCWD = process.cwd,
+    VERSION = '0.2.0';
 
 
 /**
@@ -57,13 +58,7 @@ ensureFSExistence(managerDataFile, (path) => { fs.closeSync(fs.openSync(path, 'w
 const fileIO        = io.open(managerDataFile);
 const db            = ProjectDatabase(fileIO, path.sep);
 
-// cli.version("0.0.1")
-//   .option("-H, --host <host>", "server host")
-//   .command("sub")
-//   .action((inf)=>{})
-
-cli.version('0.1.0').usage("[options] [command]");
-
+cli.version(VERSION).usage('[options] [command]');
 
 cli
     .command('add [aliases...]')
@@ -72,6 +67,22 @@ cli
     .action((aliases) => {
         const absPath = path.resolve(cli.dir || getCWD());
         db.addProject(absPath, aliases).then(shellify);
+    });
+
+cli
+    .command('remove [aliases...]')
+    .option('-a, --all', 'If --all param is set it will completely remove the directory from the list with all its aliases')
+    .description('If no alias is provided it will try to delete all aliases from your current directory')
+    .action((aliases) => {
+        const absPath = path.resolve(getCWD());
+
+        if (!aliases || aliases.length === 0) {
+            db.removeByDirectory(absPath).then(shellify);
+        } else {
+            db.removeByAliases(aliases, cli.all).then(shellify);
+        }
+
+        //db.addProject(absPath, aliases).then(shellify);
     });
 
 cli.command('*')

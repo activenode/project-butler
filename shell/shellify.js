@@ -7,43 +7,56 @@ function shellify(resultInstance) {
     const shell = new ShellSet;
     let shellString = shell.stringBuilder();
 
-    if (objType==='ProjectListResult') {
+    if (objType === 'ProjectListResult'
+        || objType === 'SearchProjectListResult') {
         shell.addMessage(
             shellString
-                .underline('').bold('Available projects:')
+                .underline('').bold(resultInstance.title)
                 .plain('')
                 .break(2)
                 .each(resultInstance.data(), function(item, index, _){
                     _.plain(`${index + 1}) ${item.absPath}`)
                     .break()
                     .plain('··')
-                    .plain(` Aliases: `).bold(`[${item.aliases.join(', ')}]`)
-                    .break();
+                    .plain(` Aliases: `).bold(`[${
+                        resultInstance.aliasesPreprocess(item.aliases).join(', ')
+                    }]`)
+                    .break(2);
                 })
                 .build()
         );
     } else if (objType === 'ExactProjectResult') {
         shell.addCd(resultInstance.getPath());
     } else if (objType === 'AddedResult') {
+        const {
+            aliases,
+            absPath
+        } = resultInstance.data();
+
         shell.addMessage(
-            'I added stuff you know'
+            shellString
+            .plain('Aliases for')
+            .break()
+            .bold(absPath)
+            .plain('')
+            .break()
+            .each(aliases, (alias, i, _) => {
+                _.plain(`· ${alias}`).break();
+            })
+            .build()
         );
-
-        /*console.log('echo "', resultInstance.data() , '"');
-        process.exit(0);*/
-
-
     } else if (objType === 'ErrorResult') {
         shell.addMessage(
             shellString
                 .each(resultInstance.getErrors(), function({text, childMessages}, index, _){
-                    _.bold(`${text}:`)
+                    _.bold(`${text}${childMessages && childMessages.length ? ':' : ''}`)
 
                     if (childMessages && Array.isArray(childMessages)) {
                         _.break(1);
                         _.each(childMessages, function(msg, i, __) {
                             __.plain(`····  ${msg}`);
                         });
+                        _.break();
                     }
                 })
                 .build()

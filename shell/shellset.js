@@ -37,7 +37,7 @@ class ShellEcho {
         if (this.type==='error') {
             prefixString = '[ERROR] ';
         }
-        return `printf "${BASH_STYLES.bold}${prefixString}${this.message}${BASH_STYLES.none}\\n"`;
+        return `printf "${BASH_STYLES.bold}${prefixString}${this.message}${BASH_STYLES.none}"`;
     }
 }
 
