@@ -1,6 +1,6 @@
 {
   "name": "project-butler",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A simple but effective PM for your CLI",
   "main": "index.js",
   "scripts": {
@@ -11,5 +11,8 @@
   "dependencies": {
     "commander": "^2.9.0",
     "os-homedir": "^1.0.2"
+  },
+  "engines": {
+    "node": ">=7.10.0"
   }
 }
