@@ -29,6 +29,8 @@ p () {
 }
 ```
 
+<p align="center"><img src="demo/_install.gif?raw=true"/></p>
+
 # Usage
 
 ```
@@ -42,6 +44,7 @@ Commands:
     p --help          | show help menu
 ```
 
+<p align="center"><img src="demo/_usage.gif?raw=true"/></p>
 
 # Developer information / FAQ
 
