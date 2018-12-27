@@ -6,7 +6,7 @@ const cli = require('commander'),
     ProjectDatabase = require('./db/database'),
     shellify = require('./shell/shellify'),
     getCWD = process.cwd,
-    VERSION = '0.2.2';
+    VERSION = '0.3.0';
 
 
 /**
