@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+/**
+ * This is the source binary file which is ran when a non-supported (non-prebuilt)
+ * platform is used. 
+ * 
+ * It is then required to run the proper node version
+ */
+const nodeVersion = process.version.match(/^v(\d+)\.(\d+)\..*/);
+const majorVersion = nodeVersion[1],
+    minorVersion = nodeVersion[2];
+
+const minNodeVersion = require('../package.json').engines.node.match(/\>\=\s*(\d+)\.(\d+)\.(\d+)/);
+const minMajorVersion = minNodeVersion[1];
+const minMinorVersion = minNodeVersion[2];
+
+if (majorVersion > minMajorVersion 
+    || (majorVersion >= minMajorVersion && minorVersion >= minMinorVersion)) {
+    require('../bin.js');
+} else {
+    // else throw error
+    console.error('You are running version ' + process.version + '. Node version required ' + minNodeVersion[0]);
+}

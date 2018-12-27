@@ -1,6 +1,11 @@
 CLI Project Manager
 ============
 
+## Preamble / Troubleshooting
+As many developers are using different node versions it is *highly recommended* that you work with the precompiled version of this project. This will be fetched **automagically** if you run a **Linux** or **Mac** System.
+
+> If you are _not_ running a Linux/Mac system or you want to use the source version instead of the binary version it is then required that you run at least the LTS version from node (`>= v8.9.0`) to not worry about compatibility issues.
+
 # Installation
 
 ## 1. Install package
@@ -36,4 +41,12 @@ Commands:
 
     p --help          | show help menu
 ```
+
+
+# Developer information / FAQ
+
+- Q: Why are you building with 10.9.0 whilst requiring 8.9.0 in your package.json?
+
+    A: There is no code-specific reason. Building the binaries for 10.9.0 is faster.
+
 
