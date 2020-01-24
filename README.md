@@ -2,7 +2,7 @@ CLI Project Manager
 ============
 
 ## Preamble / Troubleshooting
-As many developers are using different node versions it is *highly recommended* that you work with the precompiled version of this project. This will be fetched **automagically** if you run a **Linux** or **Mac** System.
+As many developers are using different node versions it is *highly recommended* that you work with the precompiled version of this project. This will be fetched **automatically** if you run a **Linux** or **Mac** System.
 
 > If you are _not_ running a Linux/Mac system or you want to use the source version instead of the binary version it is then required that you run at least the LTS version from node (`>= v8.9.0`) to not worry about compatibility issues.
 
