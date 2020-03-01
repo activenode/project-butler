@@ -6,7 +6,9 @@ const cli = require('commander'),
     ProjectDatabase = require('./db/database'),
     shellify = require('./shell/shellify'),
     getCWD = process.cwd,
-    VERSION = '0.3.0';
+    prompts = require('prompts'),
+    { shellRcPaths } = require('./helpers/shell.meta'),
+    {version: VERSION} = require('./package.json');
 
 
 /**
@@ -16,6 +18,8 @@ const cli = require('commander'),
  * the open shell.
  */
 
+const projectButlerShellCall = 'project-butler -s';
+const projectButlerShellEvalCall = `eval(${projectButlerShellCall})`;
 
 const _self = {
     name: 'alclipm',
@@ -56,7 +60,7 @@ ensureFSExistence(managerDataFile, (path) => { fs.closeSync(fs.openSync(path, 'w
 const fileIO        = io.open(managerDataFile);
 const db            = ProjectDatabase(fileIO, path.sep);
 
-cli.version(VERSION).usage('[options] [command]');
+cli.version(VERSION, '-v, --version', 'output the current version');
 
 cli
     .command('add [aliases...]')
@@ -85,16 +89,62 @@ cli
 
 cli.command('*')
     .description('Open project')
-    .action((project) => {
+    .action((project, cmd) => {
         if (cli.args.length == 2) {
             db.findBestMatch(cli.args[0]).then(shellify)
         }
     });
+  
+cli
+    .option("-s, --shell-script", "Return the shell script")
+    .option("-i, --install", "Tries to install the shell script");
 
-const args = cli.parse(process.argv).args;
-if (!args || args.length == 0) {
-    //db.debug();
-    db.fetchAll().then(shellify)
+const parsed = cli.parse(process.argv);
+if (!parsed.args || parsed.args.length == 0) {
+    if (parsed.install === true) {
+        // Trigger the installation process of the shell command
+        prompts([{
+            type: 'select',
+            name: 'shellPath',
+            message: 'What is the path to your shell config?',
+            choices: shellRcPaths.map( shellPath => {
+                return { title: shellPath, value: shellPath };
+            }),
+            initial: 0
+        }]).then(( { shellPath } ) => {
+            const rcFileExists = fs.existsSync(shellPath);
+            let bWrite = false;
+
+            try {
+                if (rcFileExists) {
+                    const rcFileContents = fs.readFileSync(shellPath);
+    
+                    if (!rcFileContents) {
+                        throw new Error('Could not read the file contents');
+                    } else if (rcFileContents.includes(projectButlerShellCall)) {
+                        console.warn('Seems to be installed already.');
+                    } else {
+                        bWrite = true;
+                    }
+                } else {
+                    bWrite = true;
+                }
+    
+                if (bWrite) {
+                    fs.appendFileSync( shellPath, `\n\n#project-butler:\n${projectButlerShellEvalCall}\n`);
+                    console.info('Installation succeeded!');
+                }
+            } catch (e) {
+                console.warn('Could not access your files. Please add the line manually:', e);
+                console.log(projectButlerShellEvalCall);
+            }
+        });
+    } else if (parsed.shellScript === true) {
+        process.stdout.write(require('./assets/shellscript.string'));
+    } else {
+        // just list all!
+        db.fetchAll().then(shellify);
+    }
 }
 
 

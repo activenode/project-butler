@@ -1,24 +1,26 @@
 {
   "name": "project-butler",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A simple but effective PM for your CLI",
   "main": "index.js",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/activenode/project-butler.git"
+    "type": "git",
+    "url": "https://github.com/activenode/project-butler.git"
   },
   "bin": "./bin/project-butler",
   "scripts": {
     "preinstall": "node ./postinstall.js",
-    "build-binary": "nexe bin.js -t 10.9.0 -o bin/darwin & docker-compose up"
+    "build-binary": "nexe bin.js -t 10.9.0 -o bin/darwin & docker-compose up",
+    "butler:open": "echo 'hello butler'"
   },
   "author": "David Lorenz <info@activenode>",
   "license": "MIT",
   "dependencies": {
     "commander": "^2.9.0",
-    "os-homedir": "^1.0.2"
+    "os-homedir": "^1.0.2",
+    "prompts": "^2.3.1"
   },
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=8.9.4"
   }
 }
