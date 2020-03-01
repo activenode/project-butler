@@ -19,7 +19,7 @@ const cli = require('commander'),
  */
 
 const projectButlerShellCall = 'project-butler -s';
-const projectButlerShellEvalCall = `eval(${projectButlerShellCall})`;
+const projectButlerShellEvalCall = `eval "$(${projectButlerShellCall})"`;
 
 const _self = {
     name: 'alclipm',
