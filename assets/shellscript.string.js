@@ -6,6 +6,7 @@ module.exports = `p () {
     #   execution went fine
         eval $RESULT
     else
-        echo -e "$RESULT"
+        echo -e "this $RESULT"
     fi
-}`;
+}
+`;

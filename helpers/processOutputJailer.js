@@ -17,9 +17,13 @@ class ProcessOutputJailer {
             }
         })(process.stderr.write);
 
-        process.on('exit', () => {
-            this.unhook();
-            this.log_flush();
+        process.on('exit', (code) => {
+            if (code !== 0) {
+                // need to make sure that we do not cause side-effects when 
+                // the program exits properly
+                this.unhook();
+                this.log_flush();
+            }
         });
     }
 
