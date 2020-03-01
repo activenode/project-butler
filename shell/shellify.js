@@ -40,8 +40,7 @@ function shellify(resultInstance) {
             const butlerRcConfig = readButlerRc(lookupButlerRc);
             if (butlerRcConfig !== null) {
                 if (butlerRcConfig.open && typeof butlerRcConfig.open === 'function') {
-                    console.log('lel', butlerRcConfig.open());
-                    //shell.addRaw(butlerRcConfig.open());
+                    shell.addRaw(butlerRcConfig.open());
                 }
             }
         }
