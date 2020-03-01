@@ -23,6 +23,16 @@ class ShellCd {
     }
 }
 
+class ShellRaw {
+    constructor(rawCommand) {
+        this.rawCommand = rawCommand;
+    }
+
+    toString() {
+        return this.rawCommand;
+    }
+}
+
 /**
  * Echo Shell command
  */
@@ -44,6 +54,13 @@ class ShellEcho {
 class ShellSet {
     constructor() {
         this.cmdSet = [];
+    }
+
+    addRaw(rawCommand) {
+        if (!rawCommand) {
+            return;
+        }
+        this.cmdSet.push(new ShellRaw(rawCommand));
     }
 
     addCd(path) {

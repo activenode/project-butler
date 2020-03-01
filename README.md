@@ -15,18 +15,8 @@ As many developers are using different node versions it is *highly recommended* 
 
 
 ```bash
-# needs to be in .bash_profile
-p () {
-  RESULT=$(project-butler "$@")
-  EXEC_TRY=$(eval $RESULT 2>&1)
-
-  if [ "$?" -eq "0" ]; then
-#   execution went fine
-    eval $RESULT
-  else
-    echo -e "$RESULT"
-  fi
-}
+# needs to be in .bash_profile / .zshrc
+$(project-butler -s)
 ```
 
 <p align="center"><img src="demo/_install.gif?raw=true"/></p>
@@ -37,11 +27,12 @@ p () {
 $ p [options] [COMMAND] [args]
 
 Commands:
-    p                 | list available projects
-    p add             | adds current directory to projects
-    p project-name    | opens the given project
+    p                       | list available projects
+    p add                   | adds current directory to projects
+    p remove project-name   | adds current directory to projects
+    p project-name          | opens the given project
 
-    p --help          | show help menu
+    p --help                | show help menu
 ```
 
 <p align="center"><img src="demo/_usage.gif?raw=true"/></p>

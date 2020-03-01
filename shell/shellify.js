@@ -1,8 +1,13 @@
-const out = o=>process.stdout.write(o);
+const out = o => process.stdout.write(o);
 const className = o=>o.__proto__.constructor.name;
 const ShellSet = require('./shellset');
+const fs = require('fs');
+const { jailProcessOutput } = require('../helpers/processOutputJailer');
+const { readButlerRc } = require('../helpers/butlerrc.js');
 
 function shellify(resultInstance) {
+    const jailedProcessOutput = jailProcessOutput();
+    
     const objType = className(resultInstance);
     const shell = new ShellSet;
     let shellString = shell.stringBuilder();
@@ -26,7 +31,20 @@ function shellify(resultInstance) {
                 .build()
         );
     } else if (objType === 'ExactProjectResult') {
+        const lookupButlerRc = `${resultInstance.getPath()}/.butlerrc.js`;
+        const rcFileExists = fs.existsSync(lookupButlerRc);
+        
         shell.addCd(resultInstance.getPath());
+
+        if (rcFileExists) {
+            const butlerRcConfig = readButlerRc(lookupButlerRc);
+            if (butlerRcConfig !== null) {
+                if (butlerRcConfig.open && typeof butlerRcConfig.open === 'function') {
+                    console.log('lel', butlerRcConfig.open());
+                    //shell.addRaw(butlerRcConfig.open());
+                }
+            }
+        }
     } else if (objType === 'AddedResult') {
         const {
             aliases,
@@ -61,8 +79,9 @@ function shellify(resultInstance) {
                 })
                 .build()
         );
-
     }
+
+    jailedProcessOutput.unhook();
 
     out(shell.toString());
     //console.log(resultInstance.getShellSet().toString());
