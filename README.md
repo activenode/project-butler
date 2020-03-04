@@ -1,6 +1,9 @@
 CLI Project Manager
 ============
 
+[![Known Vulnerabilities](https://snyk.io/test/github/activenode/project-butler/badge.svg)](https://snyk.io/test/github/activenode/project-butler)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+
 ## Preamble / Troubleshooting
 As many developers are using different node versions it is *highly recommended* that you work with the precompiled version of this project. This will be fetched **automagically** if you run a **Linux** or **Mac** System.
 
@@ -11,13 +14,11 @@ As many developers are using different node versions it is *highly recommended* 
 ## 1. Install package
 `npm -g install project-butler`
 
-## 2. Make it available in your Bash
+## 2. Make sure to call the installer to make shell calls
+`project-butler --install`
 
+## 3. DONE. You can use it now by calling `p`
 
-```bash
-# needs to be in .bash_profile / .zshrc
-$(project-butler -s)
-```
 
 <p align="center"><img src="demo/_install.gif?raw=true"/></p>
 
