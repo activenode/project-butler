@@ -1,5 +1,6 @@
 const cli = require('commander'),
     osHomedir = require('os-homedir'),
+    colors = require('colors/safe'),
     fs = require('fs'),
     path = require('path'),
     io = require('./io'),
@@ -75,16 +76,20 @@ cli
     .command('remove [aliases...]')
     .option('-a, --all', 'If --all param is set it will completely remove the directory from the list with all its aliases')
     .description('If no alias is provided it will try to delete all aliases from your current directory')
-    .action((aliases) => {
+    .action((aliases, cmd) => {
         const absPath = path.resolve(getCWD());
 
         if (!aliases || aliases.length === 0) {
             db.removeByDirectory(absPath).then(shellify);
         } else {
-            db.removeByAliases(aliases, cli.all).then(shellify);
+            db.removeByAliases(aliases, cmd.all).then(shellify);
         }
+    });
 
-        //db.addProject(absPath, aliases).then(shellify);
+cli.command('cd [alias]')
+    .description('Open project')
+    .action((alias) => {
+        console.log('db.findBestMatch(cli.args[0]).then(shellify)', alias);
     });
 
 cli.command('*')
@@ -122,7 +127,7 @@ if (!parsed.args || parsed.args.length == 0) {
                     if (!rcFileContents) {
                         throw new Error('Could not read the file contents');
                     } else if (rcFileContents.includes(projectButlerShellCall)) {
-                        console.warn('Seems to be installed already.');
+                        console.log(colors.bold.inverse('Seems to be installed already ✅'));
                     } else {
                         bWrite = true;
                     }
@@ -132,11 +137,13 @@ if (!parsed.args || parsed.args.length == 0) {
     
                 if (bWrite) {
                     fs.appendFileSync( shellPath, `\n\n#project-butler:\n${projectButlerShellEvalCall}\n`);
-                    console.info('Installation succeeded!');
+                    console.log(colors.bold.inverse('Well done. You are ready! ✅'));
                 }
             } catch (e) {
-                console.warn('Could not access your files. Please add the line manually:', e);
-                console.log(projectButlerShellEvalCall);
+                console.log(colors.bold.inverse('Could not access your files. Please add the line manually to your shell config:'));
+                console.log('');
+                console.log(colors.bold(projectButlerShellEvalCall));
+                console.log('');
             }
         });
     } else if (parsed.shellScript === true) {
