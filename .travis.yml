@@ -2,4 +2,10 @@ language: node_js
 node_js:
     - "8.9.4"
 
-script: echo "testing with version $(node -v)"
+script: echo "Running one $(node -v)"
+
+jobs:
+    include:
+    - stage: npm build
+        node_js: "8.9.4"
+        script: npm install --ignore-scripts && npm run build-binary
