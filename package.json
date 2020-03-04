@@ -24,5 +24,8 @@
   },
   "engines": {
     "node": ">=10.9.0"
+  },
+  "devDependencies": {
+    "nexe": "^3.3.2"
   }
 }
