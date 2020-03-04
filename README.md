@@ -4,6 +4,13 @@ CLI Project Manager
 [![Known Vulnerabilities](https://snyk.io/test/github/activenode/project-butler/badge.svg)](https://snyk.io/test/github/activenode/project-butler)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
+
+Build status *master* | Build status *develop* 
+--- | --- |
+[![Build Status](https://travis-ci.com/activenode/project-butler.svg?branch=master)](https://travis-ci.com/activenode/project-butler) | [![Build Status](https://travis-ci.com/activenode/project-butler.svg?branch=develop)](https://travis-ci.com/activenode/project-butler)  
+ | 
+
+
 ## Preamble / Troubleshooting
 As many developers are using different node versions it is *highly recommended* that you work with the precompiled version of this project. This will be fetched **automagically** if you run a **Linux** or **Mac** System.
 
