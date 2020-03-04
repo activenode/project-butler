@@ -8,4 +8,4 @@ jobs:
         - checkout
         - run:
             name: "Test after checkout"
-            command: echo "Hi lel"
+            command: echo "Hi test"
