@@ -10,6 +10,7 @@
   "bin": "./bin/project-butler",
   "scripts": {
     "preinstall": "node ./postinstall.js",
+    "build-darwin-binary": "nexe bin.js -t 10.9.0 -o bin/darwin",
     "build-binary": "nexe bin.js -t 10.9.0 -o bin/darwin & docker-compose up",
     "butler:open": "echo 'hello butler'"
   },
