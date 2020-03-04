@@ -8,4 +8,4 @@ jobs:
     include:
     - stage: npm build
         node_js: "8.9.4"
-        script: npm install --ignore-scripts && npm run build-binary
+        script: npm install --ignore-scripts && npm run build-darwin-binary
