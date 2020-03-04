@@ -1,0 +1,11 @@
+version: 2.1
+
+jobs:
+  build-job: 
+    docker:
+      - image: "circleci/node:8.9.0"
+      steps:
+        - checkout
+        - run:
+            name: "Test after checkout"
+            command: echo "Hi lel"
