@@ -1,11 +1,16 @@
 version: 2.1
 
+
+version: 2
 jobs:
-  build-job: 
+  build:
     docker:
       - image: "circleci/node:8.9.0"
-      steps:
-        - checkout
-        - run:
-            name: "Test after checkout"
-            command: echo "Hi test"
+    steps:
+      - checkout
+      - run: echo "$(node -v)"
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
