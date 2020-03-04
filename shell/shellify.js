@@ -1,5 +1,5 @@
 const out = o => process.stdout.write(o);
-const className = o=>o.__proto__.constructor.name;
+const className = o => o.__proto__.constructor.name;
 const ShellSet = require('./shellset');
 const fs = require('fs');
 const { jailProcessOutput } = require('../helpers/processOutputJailer');
