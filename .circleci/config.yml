@@ -5,7 +5,7 @@ jobs:
       - image: "circleci/node:8.9.0"
     steps:
       - checkout
-      - run: echo "$(node -v)"
+      - run: npm ci && npm run build-darwin-binary
 workflows:
   version: 2
   build:
