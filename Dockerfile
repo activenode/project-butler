@@ -1,4 +1,4 @@
-FROM node:8-jessie
+FROM node:10-jessie
 RUN npm i -g nexe
 RUN echo "console.log('test');" > empty.js && nexe empty.js -t linux-x64-10.9.0 -o empty.js.outbin
 RUN ./empty.js.outbin
