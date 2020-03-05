@@ -67,8 +67,8 @@ cli
     .command('add [aliases...]')
     .option('-d, --dir [path]', 'Directory to add. Default: CWD')
     .description('Adds current directory.')
-    .action((aliases) => {
-        const absPath = path.resolve(cli.dir || getCWD());
+    .action((aliases, cmd) => {
+        const absPath = path.resolve(cmd.dir || getCWD());
         db.addProject(absPath, aliases).then(shellify);
     });
 
