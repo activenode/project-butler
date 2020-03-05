@@ -1,1 +1,3 @@
 node_modules
+bin/darwin
+bin/linux

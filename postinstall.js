@@ -5,13 +5,13 @@ const os = require('os'),
     packageJSON = require('./package.json'),
     repoURL = packageJSON.repository.url,
     version = packageJSON.version,
-    rawGitBaseUrl = 'https://raw.githubusercontent.com',
+    assetGitBaseURL = 'https://github.com',
     http = require('https'),
     fs = require('fs');
 
 
 const baseGitUrl = (repoURL.match(/^.*github\.com(.*)\.git$/))[1];
-const binBaseUrl = rawGitBaseUrl + baseGitUrl + '/' + version + '/bin';
+const binBaseUrl = assetGitBaseURL + baseGitUrl + '/releases/download/' + version + '/bin';
 
 if (unsupported.indexOf(platform) >= 0) {
     console.error('Unsupported system type <' + platform + '>');
@@ -19,7 +19,7 @@ if (unsupported.indexOf(platform) >= 0) {
 }
 
 // now we can fetch the prebuilt binary (as building it on the system will take too long)
-const finalBinUrl = binBaseUrl + '/' + platform;
+const finalBinUrl = binBaseUrl + '.' + platform;
 const targetBinPath = 'bin/project-butler';
 
 if (supportedDownloadableBinaries.indexOf(platform) >= 0) {
