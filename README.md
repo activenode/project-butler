@@ -7,7 +7,7 @@ CLI Project Manager
 
 Build status *master* | Build status *develop* 
 --- | --- |
-[![Build Status](https://travis-ci.com/activenode/project-butler.svg?branch=master)](https://travis-ci.com/activenode/project-butler) | [![Build Status](https://travis-ci.com/activenode/project-butler.svg?branch=develop)](https://travis-ci.com/activenode/project-butler)  
+[![activenode](https://circleci.com/gh/activenode/project-butler/tree/master.svg?style=shield)](https://circleci.com/gh/activenode/project-butler/tree/master) | [![activenode](https://circleci.com/gh/activenode/project-butler/tree/develop.svg?style=shield)](https://circleci.com/gh/activenode/project-butler/tree/develop)
  | 
 
 
@@ -17,16 +17,10 @@ As many developers are using different node versions it is *highly recommended* 
 
 # Installation
 
-## 1. Install package
-`npm -g install project-butler`
+1. Install package `npm -g install project-butler`
+2. Make sure to call the installer to make shell calls `project-butler --install`
+3. DONE. You can use it now by calling `p`
 
-## 2. Make sure to call the installer to make shell calls
-`project-butler --install`
-
-## 3. DONE. You can use it now by calling `p`
-
-
-<p align="center"><img src="demo/_install.gif?raw=true"/></p>
 
 # Usage
 
@@ -42,5 +36,5 @@ Commands:
     p --help                | show help menu
 ```
 
-<p align="center"><img src="demo/_usage.gif?raw=true"/></p>
-
+## Adding and switching projects:
+[![asciicast](https://asciinema.org/a/bsXRoeCYhOjobDCo698xwU33D.svg)](https://asciinema.org/a/bsXRoeCYhOjobDCo698xwU33D)
