@@ -9,7 +9,7 @@
   },
   "bin": "./bin/project-butler",
   "scripts": {
-    "postinstall": "npx nexe bin.js -t 10.9.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler"
+    "postinstall": "npx nexe bin.js --fakeArgv true -t 10.13.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler"
   },
   "author": "David Lorenz <info@activenode>",
   "license": "MIT",
