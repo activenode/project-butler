@@ -13,9 +13,6 @@ jobs:
       - run: npm ci
   deploy:
     <<: *defaults
-    branches:
-      only:
-       - master # list of branches to build
     steps:
       - attach_workspace:
           at: ~/repo
@@ -31,4 +28,8 @@ workflows:
   build:
     jobs:
       - build
-      - deploy
+      - deploy:
+          filters:
+            branches:
+              only:
+               - master # list of branches to build
