@@ -5,7 +5,6 @@ defaults: &defaults
   docker:
     - image: "circleci/node:10.9.0"
 
-
 jobs:
   build:
     <<: *defaults
@@ -14,9 +13,9 @@ jobs:
       - run: npm ci
   deploy:
     <<: *defaults
-    filters:
-      tags:
-        only: /.*/
+    branches:
+      only:
+       - master # list of branches to build
     steps:
       - attach_workspace:
           at: ~/repo
