@@ -8,7 +8,6 @@ CLI Project Manager
 Build status *master* | Build status *develop* 
 --- | --- |
 [![activenode](https://circleci.com/gh/activenode/project-butler/tree/master.svg?style=shield)](https://circleci.com/gh/activenode/project-butler/tree/master) | [![activenode](https://circleci.com/gh/activenode/project-butler/tree/develop.svg?style=shield)](https://circleci.com/gh/activenode/project-butler/tree/develop)
- | 
 
 
 ## Preamble / Troubleshooting
