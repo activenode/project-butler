@@ -4,7 +4,10 @@ module.exports = `p () {
     if [ $? -ne 0 ]; then
         echo "(project-butler) ERROR: $RESULT"
     else
-        eval "$RESULT"
+        case "$RESULT" in
+            \\#shell*)   eval "$RESULT" ;;
+            *)   echo "$RESULT" ;;
+        esac
     fi
 }
 `;
