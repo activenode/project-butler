@@ -1,12 +1,10 @@
 module.exports = `p () {
-    RESULT=$(project-butler "$@")
-    EXEC_TRY=$(eval $RESULT 2>&1)
+    RESULT=$(project-butler "$@" 2>&1)
 
-    if [ "$?" -eq "0" ]; then
-    #   execution went fine
-        eval $RESULT
+    if [ $? -ne 0 ]; then
+        echo "(project-butler) ERROR: $RESULT"
     else
-        echo -e "this $RESULT"
+        eval "$RESULT"
     fi
 }
 `;
