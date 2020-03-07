@@ -10,7 +10,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm ci
+      - run: npm ci && sudo npm link && project-butler -s && eval "$(project-butler -s)" && p
   deploy:
     <<: *defaults
     steps:
@@ -28,6 +28,8 @@ workflows:
     jobs:
       - build
       - deploy:
+          requires:
+            - build
           filters:
             branches:
               only:

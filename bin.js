@@ -6,10 +6,13 @@ const cli = require('commander'),
     io = require('./io'),
     ProjectDatabase = require('./db/database'),
     shellify = require('./shell/shellify'),
+    { CommandWrapper } = require('./db/structs'),
     getCWD = process.cwd,
+    parsePackageJson = require('./helpers/parsePackageJson');
     prompts = require('prompts'),
     { shellRcPaths } = require('./helpers/shell.meta'),
     {version: VERSION} = require('./package.json');
+
 
 
 /**
@@ -22,6 +25,10 @@ const cli = require('commander'),
 const projectButlerShellCall = 'project-butler -s';
 const projectButlerShellEvalCall = `eval "$(${projectButlerShellCall})"`;
 
+
+// to be honest i forgot where the name 
+// "alclipm" comes from. Probably some abbreviation that i forgot.
+// maybe in the future migrate to just `.project-butler`
 const _self = {
     name: 'alclipm',
     dataDir: '.alclipmdata'
@@ -86,17 +93,51 @@ cli
         }
     });
 
+
+const tryOpenProjectByAliasOrName = aliasOrName => {
+    db.findBestMatch(aliasOrName).then(shellify)
+};
+
+const openProjectOrCallAction = ( projectNameOrAction, currentWorkingDirectoryAbsPath ) => {
+    // check if we currently are in a working directory that 
+    // is in our database (so its a project-butler project)
+    // if yes first check if there is npm commands to run
+    // we might consider at a later point to genericify the tool (npm, yarn, whatever)
+    // but for now npm should be okay
+
+    db.getExactProjectResultByAbsoluteDirectory(currentWorkingDirectoryAbsPath).then(projectResult => {
+        let bCommandCalled = false;
+        if (projectResult) {
+            // got a hit. is already in a project-butler directory right now
+            // lets check if there is a package json with scripts
+            const packageJson = parsePackageJson(`${currentWorkingDirectoryAbsPath}/package.json`);
+            const potentialNpmScriptToExecute = packageJson.getScript(projectNameOrAction);
+
+            if (potentialNpmScriptToExecute) {
+                bCommandCalled = true;
+                shellify(new CommandWrapper(`npm run ${projectNameOrAction}`));
+            }
+        }
+
+        if (!bCommandCalled) {
+            // didnt find any fitting command so search for project-fit
+            tryOpenProjectByAliasOrName(projectNameOrAction);
+        }
+    })
+}
+
 cli.command('cd [alias]')
     .description('Open project')
-    .action((alias) => {
-        console.log('db.findBestMatch(cli.args[0]).then(shellify)', alias);
-    });
+    .action((alias) => tryOpenProjectByAliasOrName(alias));
 
 cli.command('*')
-    .description('Open project')
-    .action((project, cmd) => {
-        if (cli.args.length == 2) {
-            db.findBestMatch(cli.args[0]).then(shellify)
+    .description('Open project or trigger action')
+    .action((projectNameOrAction, cmd) => {
+        if (projectNameOrAction) {
+            openProjectOrCallAction(
+                projectNameOrAction, 
+                path.resolve(getCWD())
+            );
         }
     });
   
