@@ -27,12 +27,14 @@ As many developers are using different node versions it is *highly recommended* 
 $ p [options] [COMMAND] [args]
 
 Commands:
-    p                       | list available projects
-    p add                   | adds current directory to projects
-    p remove project-name   | adds current directory to projects
-    p project-name          | opens the given project
+    p                             | list available projects
+    p add                         | adds current directory to projects
+    p remove project-name         | adds current directory to projects
+    p cd project-name             | opens the given project 
+    p project-name                | opens the given project (shortcut for `p cd`)
+    p script-name                 | if inside a project you can trigger a script with this
 
-    p --help                | show help menu
+    p --help                      | show help menu
 ```
 
 ## Adding and switching projects:
