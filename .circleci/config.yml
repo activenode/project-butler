@@ -10,7 +10,18 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm ci && sudo npm link && project-butler -s && eval "$(project-butler -s)" && p
+      - run: 
+          name: npm install
+          command: npm ci --ignore-scripts 
+      - run: 
+          name: Link the package in the system
+          command: sudo npm link --ignore-scripts 
+      - run:
+          name: Check if project-butler command runs
+          command: project-butler -s 
+      - run:
+          name: Execute "p" alias 
+          command: eval "$(project-butler -s)" && p
   deploy:
     <<: *defaults
     steps:
