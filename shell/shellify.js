@@ -12,7 +12,9 @@ function shellify(resultInstance) {
     const shell = new ShellSet;
     let shellString = shell.stringBuilder();
 
-    if (objType === 'ProjectListResult'
+    if (objType === 'CommandWrapper') {
+        shell.addRaw(resultInstance.toString());
+    } else if (objType === 'ProjectListResult'
         || objType === 'SearchProjectListResult') {
         shell.addMessage(
             shellString
@@ -83,8 +85,6 @@ function shellify(resultInstance) {
     jailedProcessOutput.unhook();
 
     out(shell.toString());
-    //console.log(resultInstance.getShellSet().toString());
-    //out(':');
 }
 
 module.exports = shellify;
