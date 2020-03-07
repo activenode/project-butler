@@ -170,6 +170,18 @@ class ProjectDatabase {
         });
     }
 
+    getExactProjectResultByAbsoluteDirectory(sAbsoluteDirectoryPath) {
+        return this.load().then(_ => {
+            const absoluteDirectoryIndex = this.absPathToIndex.get(sAbsoluteDirectoryPath);
+            
+            if (typeof absoluteDirectoryIndex !== 'number') {
+                return null;
+            } else {
+                return new ExactProjectResult(this.indexToProject.get(absoluteDirectoryIndex));
+            }
+        });
+    }
+
     /**
      * Will search for a best match. E.g. `cl` would match `cli` and return an exact
      * but if there is `cli` and `cla` then it would just return Proposals

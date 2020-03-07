@@ -127,6 +127,16 @@ class ProjectProposalResult extends ProjectListResult {
     }
 }
 
+class CommandWrapper {
+    constructor (command) {
+        this.command = command;
+    }
+
+    toString() {
+        return this.command;
+    }
+}
+
 module.exports = {
     ErrorResult: ErrorResult,
     ProjectListResult: ProjectListResult,
@@ -134,4 +144,5 @@ module.exports = {
     ProjectProposalResult: ProjectProposalResult,
     ExactProjectResult: ExactProjectResult,
     AddedResult: AddedResult,
+    CommandWrapper: CommandWrapper,
 };
