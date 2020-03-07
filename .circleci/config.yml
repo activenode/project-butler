@@ -10,7 +10,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm ci && sudo npm link && project-butler -s && eval "$(project-butler -s)" && p
+      - run: npm ci && sudo npm link --ignore-scripts && project-butler -s && eval "$(project-butler -s)" && p
   deploy:
     <<: *defaults
     steps:
