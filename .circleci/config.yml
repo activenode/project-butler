@@ -18,10 +18,10 @@ jobs:
           command: sudo npm link --ignore-scripts 
       - run:
           name: Check if project-butler command runs
-          command: project-butler -s && eval "$(project-butler -s)"
+          command: project-butler -s 
       - run:
           name: Execute "p" alias 
-          command: p
+          command: eval "$(project-butler -s)" && p
   deploy:
     <<: *defaults
     steps:
