@@ -10,7 +10,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm ci
+      - run: npm ci && npm link && project-butler -s
   deploy:
     <<: *defaults
     steps:
