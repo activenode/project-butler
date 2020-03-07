@@ -84,7 +84,7 @@ function shellify(resultInstance) {
 
     jailedProcessOutput.unhook();
 
-    out(shell.toString());
+    out(`#shell\n${shell.toString()}`);
 }
 
 module.exports = shellify;
