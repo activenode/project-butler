@@ -17,7 +17,7 @@ As many developers are using different node versions it is *highly recommended* 
 # Installation
 
 1. Install package `npm -g install project-butler`
-2. Make sure to call the installer to make shell calls `project-butler --install`
+2. Reload your shell
 3. DONE. You can use it now by calling `p`
 
 
