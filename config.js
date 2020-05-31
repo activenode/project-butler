@@ -12,7 +12,7 @@ module.exports = {
       dbRootDirectory,
       dbManagerFilePathAbsolute: `${dbRootDirectory}/storage`,
    },
-   commands: {
+   shellCommands: {
       shellAliasGetterString,
       shellAliasGetterEvalString,
    },
