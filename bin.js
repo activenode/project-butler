@@ -12,9 +12,9 @@ const cli = require("commander"),
    ensureStorageExistence = require("./db/ensureStorageExistence"),
    getDatabaseManager = require("./db/getDatabaseManager"),
    // ------------------------------
-   cliCmd_addProject = require("./cli/addProject"),
-   cliCmd_removeProject = require("./cli/removeProject"),
-   cliCmd_openProjectOrCallCommand = require("./cli/openProjectOrCallCommand"),
+   setupCommand_addProject = require("./cli/addProject"),
+   setupCommand_removeProject = require("./cli/removeProject"),
+   setupCommand_openProjectOrCallCommand = require("./cli/openProjectOrCallCommand"),
    // ------------------------------
    cli_returnShellScript = require("./cli/commandless/shellScript"),
    cli_installAliasInShellRc = require("./cli/commandless/installAliasInShellRc"),
@@ -31,13 +31,9 @@ cli.version(VERSION, "-v, --version", "output the current version")
    .option("-s, --shell-script", "Return the shell script")
    .option("-i, --install", "Tries to install the shell script");
 
-const commands = [
-   cliCmd_addProject,
-   cliCmd_removeProject,
-   cliCmd_openProjectOrCallCommand,
-];
-
-commands.forEach((cmdBinder) => cmdBinder(cli, db));
+setupCommand_addProject(cli, db);
+setupCommand_removeProject(cli, db);
+setupCommand_openProjectOrCallCommand(cli, db);
 
 // parse the cli arguments
 const parsedCliArgs = cli.parse(process.argv);
@@ -46,23 +42,20 @@ if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
    // ! Each of the following functions will only run if the previous one returned Boolean(true)
    // ! This makes them mutual exclusive and the catchAll only runs if the others did not apply
 
-   const mutualExclusiveExecutors = [
+   const mutualExclusiveCliEvaluators = [
       cli_returnShellScript,
       cli_installAliasInShellRc,
       cli_catchAll,
    ];
 
+   // * We follow the same approach as "express" by waiting for the previous "next()" function
+   // * to be called. So we execute the next promise only if the previous one resolved!
    let lastPromise = Promise.resolve();
-   mutualExclusiveExecutors.forEach((cmdToExecuteAfterLastPromiseResolved) => {
+   mutualExclusiveCliEvaluators.forEach((cliEvaluator) => {
       lastPromise = lastPromise.then(
          () =>
             new Promise((next) => {
-               cmdToExecuteAfterLastPromiseResolved(
-                  cli,
-                  db,
-                  parsedCliArgs,
-                  next
-               );
+               cliEvaluator(cli, db, parsedCliArgs, next);
             })
       );
    });
