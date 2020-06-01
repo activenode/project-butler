@@ -18,7 +18,7 @@ const cli = require("commander"),
    // ------------------------------
    cli_returnShellScript = require("./cli/commandless/shellScript"),
    cli_installAliasInShellRc = require("./cli/commandless/installAliasInShellRc"),
-   cli_catchAll = require("./cli/catchAll");
+   cli_catchAll = require("./cli/commandless/catchAll");
 
 // gotta make sure we can write to the Database! Safety first!
 ensureStorageExistence();

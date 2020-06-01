@@ -1,8 +1,8 @@
 const colors = require("colors/safe"),
-   config = require("../config"),
+   config = require("../../config"),
    enquirer = require("enquirer"),
    fs = require("fs"),
-   { shellRcPaths } = require("../utils/shell.meta");
+   { shellRcPaths } = require("../../utils/shell.meta");
 
 // setup an autocomplete to be used later 🤓
 const shellRcSelectAutocomplete = new enquirer.AutoComplete({

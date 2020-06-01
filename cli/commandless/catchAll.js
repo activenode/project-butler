@@ -1,6 +1,6 @@
 const getCWD = process.cwd,
    enquirer = require("enquirer"),
-   config = require("../config");
+   config = require("../../config");
 
 module.exports = function (cli, db, flags) {
    db.fetchAll().then((projectListResult) => {
