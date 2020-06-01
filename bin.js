@@ -1,3 +1,6 @@
+require("./utils/stdoutToStderrProxy");
+// ! ^ we require this so that Stdout is redirected immediately after
+
 /**
  * Important:
  * This is an interface layer for an overlaying shell caller.
@@ -5,8 +8,6 @@
  * the open shell.
  */
 const { version: VERSION } = require("./package.json");
-
-require("./utils/stdoutToStderrProxy");
 
 const cli = require("commander"),
    ensureStorageExistence = require("./db/ensureStorageExistence"),
@@ -43,9 +44,9 @@ if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
    // ! This makes them mutual exclusive and the catchAll only runs if the others did not apply
 
    const mutualExclusiveCliEvaluators = [
-      cli_returnShellScript,
-      cli_installAliasInShellRc,
-      cli_catchAll,
+      cli_returnShellScript, // option -s --shell-script
+      cli_installAliasInShellRc, // option -i --install-alias
+      cli_catchAll, // if nothing was met this will execute
    ];
 
    // * We follow the same approach as "express" by waiting for the previous "next()" function
