@@ -4,7 +4,7 @@ const fs = require("fs"),
       database: { dbRootDirectory, dbManagerFilePathAbsolute },
    } = require("../config");
 
-function syncEnsureStorageExists() {
+function ensureStorageExistence() {
    // to be honest i forgot where the name
    // "alclipm" comes from. Probably some abbreviation that i forgot.
    // maybe in the future migrate to just `.project-butler`
@@ -39,4 +39,4 @@ function syncEnsureStorageExists() {
    });
 }
 
-module.exports.syncEnsureStorageExists = syncEnsureStorageExists;
+module.exports = ensureStorageExistence;

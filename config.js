@@ -1,4 +1,4 @@
-const homedir = require("./helpers/getHomeDirectory");
+const homedir = require("./utils/getHomeDirectory");
 
 const directoryNameProjectButler = ".alclipmdata";
 const dbRootDirectory = `${homedir}/${directoryNameProjectButler}`;

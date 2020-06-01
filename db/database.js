@@ -4,7 +4,7 @@ const {
    SearchProjectListResult,
    ExactProjectResult,
    AddedResult,
-} = require("./structs");
+} = require("./dbResultModels");
 let log = function () {
    console.log(Array.from(arguments));
 };

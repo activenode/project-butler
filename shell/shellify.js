@@ -1,7 +1,7 @@
 const className = (o) => o.__proto__.constructor.name;
 const ShellSet = require("./shellset");
 const fs = require("fs");
-const { readButlerRc } = require("../helpers/butlerrc.js");
+const { readButlerRc } = require("../utils/butlerrc.js");
 
 function shellify(resultInstance) {
    const objType = className(resultInstance);
