@@ -16,8 +16,8 @@ const cli = require("commander"),
    cliCmd_removeProject = require("./cli/removeProject"),
    cliCmd_openProjectOrCallCommand = require("./cli/openProjectOrCallCommand"),
    // ------------------------------
-   cli_flagsOnly_returnShellScript = require("./cli/_flagsOnly_shellScript"),
-   cli_flagsOnly_installAliasInShellRc = require("./cli/_flagsOnly_installAliasInShellRc"),
+   cli_returnShellScript = require("./cli/commandless/shellScript"),
+   cli_installAliasInShellRc = require("./cli/commandless/installAliasInShellRc"),
    cli_catchAll = require("./cli/catchAll");
 
 // gotta make sure we can write to the Database! Safety first!
@@ -47,8 +47,8 @@ if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
    // ! This makes them mutual exclusive and the catchAll only runs if the others did not apply
 
    const mutualExclusiveExecutors = [
-      cli_flagsOnly_returnShellScript,
-      cli_flagsOnly_installAliasInShellRc,
+      cli_returnShellScript,
+      cli_installAliasInShellRc,
       cli_catchAll,
    ];
 
