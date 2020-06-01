@@ -4,6 +4,9 @@ const {
    SearchProjectListResult,
    ExactProjectResult,
    AddedResult,
+   // ---------------------------
+   ProjectAddSuccess,
+   ProjectUpdateSuccess,
 } = require("./dbResultModels");
 let log = function () {
    console.log(Array.from(arguments));
@@ -328,10 +331,12 @@ class ProjectDatabase {
 
       //----else:------------
       const result = new AddedResult();
+      let projectExistedBefore = false;
 
       return this.load(true).then((obj) => {
          let aliasesToWrite = [];
          if (obj.projects.quickRef[uid]) {
+            projectExistedBefore = true;
             result.addWarning(
                "Info: Project already exists, will merge the definitions now."
             );
@@ -348,9 +353,13 @@ class ProjectDatabase {
          return this.parseData(obj)
             .then(this.save())
             .then(() => this.getProjectDetailsByUID(uid))
-            .then((projectDetails) =>
-               result.saveProjectDetails(projectDetails)
-            );
+            .then((projectDetails) => {
+               if (projectExistedBefore) {
+                  return new ProjectUpdateSuccess(projectDetails);
+               } else {
+                  return new ProjectAddSuccess(projectDetails);
+               }
+            });
       });
    }
 
