@@ -20,7 +20,7 @@ const shellRcSelectAutocomplete = new enquirer.AutoComplete({
    }),
 });
 
-module.exports = function (cli, db, flags) {
+module.exports = function (cli, db, flags, next) {
    if (flags.install === true) {
       // Trigger the installation process of the shell command
       shellRcSelectAutocomplete.run().then(({ shellPath }) => {
