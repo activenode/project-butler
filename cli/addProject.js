@@ -1,7 +1,8 @@
 const path = require("path"),
-   { StdoutToStderrProxy } = require("../utils/stdoutToStderrProxy"),
-   shellify = require("../shell/shellify")(StdoutToStderrProxy),
    getCWD = process.cwd,
+   columns = require("cli-columns"),
+   colors = require("colors/safe"),
+   { StdoutToStderrProxy } = require("../utils/stdoutToStderrProxy"),
    {
       ProjectAddSuccess,
       ProjectUpdateSuccess,
@@ -20,7 +21,17 @@ module.exports = function (cli, db) {
                if (dbResult instanceof ProjectAddSuccess) {
                   console.log(" 😌 Successfully added the project directory ");
                } else if (dbResult instanceof ProjectUpdateSuccess) {
+                  console.log("");
                   console.log(" 👋 Successfully updated the project ");
+                  console.log(
+                     `Aliases for ${colors.bold.inverse(
+                        dbResult.projectDetails.absPath
+                     )}: \n${columns(
+                        dbResult.projectDetails.aliases.map((aliasString) => {
+                           return `\n ${colors.inverse(`*️⃣  ${aliasString} `)}`;
+                        })
+                     )}`
+                  );
                } else {
                   throw new Error(`Unknown Error occurred ${dbResult}`);
                }
