@@ -25,25 +25,6 @@ class Result {
    }
 }
 
-class AddedResult extends Result {
-   constructor() {
-      super();
-   }
-
-   hasWarnings() {
-      return this.messages.warn.length > 0;
-   }
-
-   addWarning(text) {
-      this.messages.warn.push({ text: text });
-   }
-
-   saveProjectDetails(projectDetails) {
-      this.resultData = projectDetails;
-      return this;
-   }
-}
-
 /**
  * Represents an error as result
  */
@@ -162,15 +143,29 @@ class ProjectUpdateSuccess {
    }
 }
 
+class ProjectCollectionResult {
+   constructor(projects) {
+      this._projects = projects;
+   }
+
+   get projects() {
+      return this._projects;
+   }
+
+   isEmpty() {
+      return this._projects.length === 0;
+   }
+}
+
 module.exports = {
    ErrorResult: ErrorResult,
    ProjectListResult: ProjectListResult,
    SearchProjectListResult: SearchProjectListResult,
    ProjectProposalResult: ProjectProposalResult,
    ExactProjectResult: ExactProjectResult,
-   AddedResult: AddedResult,
    CommandWrapper: CommandWrapper,
    // ---------------------------
    ProjectAddSuccess: ProjectAddSuccess,
    ProjectUpdateSuccess: ProjectUpdateSuccess,
+   ProjectCollectionResult: ProjectCollectionResult,
 };

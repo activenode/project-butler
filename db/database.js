@@ -3,10 +3,10 @@ const {
    ProjectListResult,
    SearchProjectListResult,
    ExactProjectResult,
-   AddedResult,
    // ---------------------------
    ProjectAddSuccess,
    ProjectUpdateSuccess,
+   ProjectCollectionResult,
 } = require("./dbResultModels");
 let log = function () {
    console.log(Array.from(arguments));
@@ -93,9 +93,9 @@ class ProjectDatabase {
          : Array.from(this.uidToIndex.keys());
       return Promise.all(
          uids.map((uid) => this.getProjectDetailsByUID(uid))
-      ).then(
-         (projectDetailsArray) => new ProjectListResult(projectDetailsArray)
-      );
+      ).then((projectDetailsArray) => {
+         return new ProjectCollectionResult(projectDetailsArray);
+      });
    }
 
    /**
@@ -182,9 +182,9 @@ class ProjectDatabase {
 
    getExactProjectResultByAlias(sAlias) {
       return this.load().then((_) => {
-         return new ExactProjectResult(
-            this.indexToProject.get(this.aliasesToIndex.get(sAlias))
-         );
+         return new ProjectCollectionResult([
+            this.indexToProject.get(this.aliasesToIndex.get(sAlias)),
+         ]);
       });
    }
 
@@ -197,9 +197,9 @@ class ProjectDatabase {
          if (typeof absoluteDirectoryIndex !== "number") {
             return null;
          } else {
-            return new ExactProjectResult(
-               this.indexToProject.get(absoluteDirectoryIndex)
-            );
+            return new ProjectCollectionResult([
+               this.indexToProject.get(absoluteDirectoryIndex),
+            ]);
          }
       });
    }
@@ -252,9 +252,7 @@ class ProjectDatabase {
          });
 
          return this.fetchAll(uids).then((projectListResult) => {
-            return new SearchProjectListResult(projectListResult, {
-               searchString,
-            });
+            return new ProjectCollectionResult(projectListResult);
          });
       });
    }
@@ -330,16 +328,12 @@ class ProjectDatabase {
       }
 
       //----else:------------
-      const result = new AddedResult();
       let projectExistedBefore = false;
 
       return this.load(true).then((obj) => {
          let aliasesToWrite = [];
          if (obj.projects.quickRef[uid]) {
             projectExistedBefore = true;
-            result.addWarning(
-               "Info: Project already exists, will merge the definitions now."
-            );
             aliasesToWrite = [].concat(obj.projects.quickRef[uid].aliases);
          }
 

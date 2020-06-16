@@ -1,10 +1,22 @@
 const path = require("path"),
    getCWD = process.cwd,
+   fs = require("fs"),
    colors = require("colors/safe"),
+   { log, logErr } = require("../utils/log"),
    {
       ProjectAddSuccess,
       ProjectUpdateSuccess,
    } = require("../db/dbResultModels");
+
+const logAliases = (projectDirectory, aliases) => {
+   log(
+      `Aliases for ${colors.bold.inverse(projectDirectory)}: \n${aliases
+         .map((aliasString) => {
+            return `\n ${colors.bold(`＋ ${aliasString} `)}`;
+         })
+         .join("")}`
+   );
+};
 
 module.exports = function (cli, db) {
    cli.command("add [aliases...]")
@@ -12,23 +24,40 @@ module.exports = function (cli, db) {
       .description("Adds current directory.")
       .action((aliases, cmd) => {
          const absPath = path.resolve(cmd.dir || getCWD());
-         // db.addProject(absPath, aliases).then(shellify);
+
+         try {
+            const isDirectory = fs.statSync(absPath).isDirectory();
+
+            if (!isDirectory) {
+               throw new Error("Is not a directory");
+            }
+         } catch (e) {
+            logErr(
+               `🐼 Sorry Pandabear! The given path to ${absPath} is not a directory`
+            );
+            return;
+         }
+
+         const dirname = path.basename(absPath);
 
          db.addProject(absPath, aliases)
             .then((dbResult) => {
-               console.log("");
+               log("");
                if (dbResult instanceof ProjectAddSuccess) {
-                  console.log(" 😌 Successfully added the project directory ");
+                  log(
+                     ` 😌 Successfully added the project [${colors.bold.inverse(
+                        dirname
+                     )}] `
+                  );
+                  logAliases(
+                     dbResult.projectDetails.absPath,
+                     dbResult.projectDetails.aliases
+                  );
                } else if (dbResult instanceof ProjectUpdateSuccess) {
-                  console.log(" 👋 Successfully updated the project ");
-                  console.log(
-                     `Aliases for ${colors.bold.inverse(
-                        dbResult.projectDetails.absPath
-                     )}: \n${dbResult.projectDetails.aliases
-                        .map((aliasString) => {
-                           return `\n ${colors.bold(`＋ ${aliasString} `)}`;
-                        })
-                        .join("")}`
+                  log(" 👋 Successfully updated the project ");
+                  logAliases(
+                     dbResult.projectDetails.absPath,
+                     dbResult.projectDetails.aliases
                   );
                } else {
                   throw new Error(`Unknown Error occurred`);
@@ -36,7 +65,7 @@ module.exports = function (cli, db) {
             })
             .catch((error) => {
                if (error instanceof Error) {
-                  console.error(error.message);
+                  logErr(error.message);
                }
             });
       });

@@ -93,10 +93,10 @@ function shellify(resultInstance) {
    return `#shell\n${shell.toString()}`;
 }
 
-module.exports = function (StdoutToStderrProxy) {
+module.exports = function (OutputController) {
    return function () {
       const shellifiedResult = shellify(...arguments);
-      StdoutToStderrProxy.writeToActualStdout(shellifiedResult);
+      OutputController.writeToActualStdout(shellifiedResult);
       return shellifiedResult;
    };
 };

@@ -1,4 +1,4 @@
-require("./utils/stdoutToStderrProxy");
+require("./utils/OutputController");
 // ! ^ we require this so that Stdout is redirected immediately after
 
 /**
@@ -19,6 +19,7 @@ const cli = require("commander"),
    // ------------------------------
    cli_returnShellScript = require("./cli/commandless/shellScript"),
    cli_installAliasInShellRc = require("./cli/commandless/installAliasInShellRc"),
+   cli_cleanup = require("./cli/commandless/cleanup"),
    cli_catchAll = require("./cli/commandless/catchAll");
 
 // gotta make sure we can write to the Database! Safety first!
@@ -30,7 +31,11 @@ const db = getDatabaseManager();
 //----------------------------------------
 cli.version(VERSION, "-v, --version", "output the current version")
    .option("-s, --shell-script", "Return the shell script")
-   .option("-i, --install", "Tries to install the shell script");
+   .option("-i, --install", "Tries to install the shell script")
+   .option(
+      "-c, --clean, --cleanup",
+      "Will remove orphaned projects from the list (just call `p --clean`)"
+   );
 
 setupCommand_addProject(cli, db);
 setupCommand_removeProject(cli, db);
@@ -46,6 +51,7 @@ if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
    const mutualExclusiveCliEvaluators = [
       cli_returnShellScript, // option -s --shell-script
       cli_installAliasInShellRc, // option -i --install-alias
+      cli_cleanup, // option -c --clean --cleanup
       cli_catchAll, // if nothing was met this will execute
    ];
 

@@ -1,6 +1,6 @@
 const path = require("path"),
-   { StdoutToStderrProxy } = require("../utils/stdoutToStderrProxy"),
-   shellify = require("../shell/shellify")(StdoutToStderrProxy),
+   { OutputController } = require("../utils/OutputController"),
+   shellify = require("../shell/shellify")(OutputController),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {

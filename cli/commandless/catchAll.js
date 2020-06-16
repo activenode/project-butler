@@ -1,14 +1,17 @@
-const getCWD = process.cwd,
-   enquirer = require("enquirer"),
-   config = require("../../config");
+const { OutputController } = require("../../utils/OutputController"),
+   { AutoComplete, Confirm } = require("../../utils/prompt"),
+   { log, logErr } = require("../../utils/log"),
+   fs = require("fs"),
+   config = require("../../config"),
+   { ProjectCollectionResult } = require("../../db/dbResultModels");
 
 module.exports = function (cli, db, flags) {
-   db.fetchAll().then((projectListResult) => {
-      if (!projectListResult || !Array.isArray(projectListResult.resultData)) {
-         throw new Error("Invalid Result");
+   db.fetchAll().then((dbResult) => {
+      if (!dbResult || !(dbResult instanceof ProjectCollectionResult)) {
+         throw new Error("Invalid Result type");
       }
 
-      const projectsArray = projectListResult.resultData;
+      const projectsArray = dbResult.projects;
 
       const longestDirectoryNameLength = projectsArray.reduce(
          (longestInt, { directoryName }) => {
@@ -19,10 +22,9 @@ module.exports = function (cli, db, flags) {
          0
       );
 
-      new enquirer.AutoComplete({
+      AutoComplete({
          name: "project",
          message: "Choose a project (type for autocompletion)",
-         stdout: process.stderr,
          choices: projectsArray.map(({ absPath, directoryName, aliases }) => {
             const homeDirRx = new RegExp("^" + config.homedir, "i");
             return {
@@ -31,7 +33,7 @@ module.exports = function (cli, db, flags) {
                   directoryName,
                   aliases,
                   toString: function () {
-                     return absPath;
+                     return absPath; // we need the toString method since enquirer will call value.toString()
                   },
                },
                // name: absPath,
@@ -42,27 +44,35 @@ module.exports = function (cli, db, flags) {
             };
          }),
       })
-         .run()
-         .then(({ aliases, absPath }) => {
+         .then(({ absPath }) => {
             if (!fs.existsSync(absPath)) {
-               console.log("--------------------");
-               new enquirer.Confirm({
-                  message: "ℹ️  The directory is gone! Delete it?  ",
-                  stdout: process.stderr,
-                  initial: "Y",
+               log("--------------------");
+               Confirm({
+                  message:
+                     "ℹ️  The directory is gone! Remove from butler list?  ",
                })
-                  .run()
-                  .then((boolDoDelete) => {
-                     if (!boolDoDelete) {
-                        console.log(`No worries I left it in the List!`);
+                  .then((bool) => {
+                     if (!bool) {
+                        log(`No worries I left it in the List!`);
+                     } else {
+                        db.removeByDirectory(absPath)
+                           .then(() => log("Done!"))
+                           .catch((e) =>
+                              logErr(
+                                 "Could not remove project from list. Unknown error occured.",
+                                 e
+                              )
+                           );
                      }
                   })
-                  .catch(console.error);
+                  .catch(logErr);
             } else {
-               console.log("Switching to the directory now");
-               openProjectOrCallAction(aliases[0], path.resolve(getCWD()));
+               log("Switching to the directory now");
+
+               const normalizedPath = absPath.replace(" ", "\\ ");
+               OutputController.shell().cd(normalizedPath);
             }
          })
-         .catch(console.error);
+         .catch(logErr);
    });
 };
