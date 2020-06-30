@@ -2,21 +2,11 @@ const path = require("path"),
    getCWD = process.cwd,
    fs = require("fs"),
    colors = require("colors/safe"),
-   { log, logErr } = require("../utils/log"),
+   { log, logErr, logProjectAliases, logBox } = require("../utils/log"),
    {
       ProjectAddSuccess,
       ProjectUpdateSuccess,
    } = require("../db/dbResultModels");
-
-const logAliases = (projectDirectory, aliases) => {
-   log(
-      `Aliases for ${colors.bold.inverse(projectDirectory)}: \n${aliases
-         .map((aliasString) => {
-            return `\n ${colors.bold(`＋ ${aliasString} `)}`;
-         })
-         .join("")}`
-   );
-};
 
 module.exports = function (cli, db) {
    cli.command("add [aliases...]")
@@ -44,18 +34,18 @@ module.exports = function (cli, db) {
             .then((dbResult) => {
                log("");
                if (dbResult instanceof ProjectAddSuccess) {
-                  log(
+                  logBox(
                      ` 😌 Successfully added the project [${colors.bold.inverse(
                         dirname
                      )}] `
                   );
-                  logAliases(
+                  logProjectAliases(
                      dbResult.projectDetails.absPath,
                      dbResult.projectDetails.aliases
                   );
                } else if (dbResult instanceof ProjectUpdateSuccess) {
                   log(" 👋 Successfully updated the project ");
-                  logAliases(
+                  logProjectAliases(
                      dbResult.projectDetails.absPath,
                      dbResult.projectDetails.aliases
                   );

@@ -45,6 +45,9 @@ class OutputController {
          cd: function (cdPath) {
             OutputController.writeToActualStdout(`cd ${cdPath}`);
          },
+         command: function (rawCommand) {
+            OutputController.writeToActualStdout(rawCommand);
+         },
       };
    }
 }

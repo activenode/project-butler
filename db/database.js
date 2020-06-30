@@ -1,8 +1,5 @@
 const {
-   ErrorResult,
    ProjectListResult,
-   SearchProjectListResult,
-   ExactProjectResult,
    // ---------------------------
    ProjectAddSuccess,
    ProjectUpdateSuccess,
@@ -15,26 +12,21 @@ log.json = (_logdata) => log(JSON.stringify(_logdata));
 const PATH_DELIMITER = ":";
 const EMPTY_STRUCT = { projects: { quickRef: {} }, _settings: { _i: 0 } };
 
-function err(error, childMessages = []) {
-   let errorResult = new ErrorResult().addError(error, childMessages);
-   return errorResult;
-}
+// function getKeysFromMap(m) {
+//    return Array.from(m || new Map()).map((keyValueArr) => {
+//       return keyValueArr[0];
+//    });
+// }
 
-function getKeysFromMap(m) {
-   return Array.from(m || new Map()).map((keyValueArr) => {
-      return keyValueArr[0];
-   });
-}
-
-function matchesInArray(searchString, arr) {
-   return arr.filter((value) => {
-      if (value.replace(searchString, "") !== value) {
-         // contained it, return with TRUE
-         return true;
-      }
-      return false;
-   });
-}
+// function matchesInArray(searchString, arr) {
+//    return arr.filter((value) => {
+//       if (value.replace(searchString, "") !== value) {
+//          // contained it, return with TRUE
+//          return true;
+//       }
+//       return false;
+//    });
+// }
 
 class ProjectDatabase {
    /**
@@ -82,10 +74,6 @@ class ProjectDatabase {
       }
    }
 
-   /**
-    * Will fetch all available projects
-    * @return {Promise<ProjectListResult>}
-    */
    async fetchAll(uidsPrefiltered) {
       await this.load();
       const uids = Array.isArray(uidsPrefiltered)
@@ -180,12 +168,27 @@ class ProjectDatabase {
       });
    }
 
-   getExactProjectResultByAlias(sAlias) {
-      return this.load().then((_) => {
-         return new ProjectCollectionResult([
-            this.indexToProject.get(this.aliasesToIndex.get(sAlias)),
-         ]);
-      });
+   async getExactProjectResultByAlias(sAlias) {
+      await this.load();
+      const uid = this.indexToUid.get(this.aliasesToIndex.get(sAlias));
+
+      if (!uid) {
+         throw new Error("uid could not be retrieved for given sAlias param");
+      }
+
+      const fetchResult = await this.fetchAll([uid]);
+
+      if (
+         fetchResult instanceof ProjectCollectionResult &&
+         !fetchResult.isEmpty()
+      ) {
+         // single return and make it very clear!
+         return new InstantProjectResult(fetchResult.projects[0]);
+      } else {
+         throw new Error(
+            "Tried to fetch an exact project by a presumably existing alias but could not find anything and did not receive ProjectCollectionResult"
+         );
+      }
    }
 
    getExactProjectResultByAbsoluteDirectory(sAbsoluteDirectoryPath) {
@@ -210,50 +213,24 @@ class ProjectDatabase {
     * @param {string} searchString
     */
    findNextBestMatch(searchString) {
-      return this.load().then((_) => {
-         const foundMatches = matchesInArray(
-            searchString,
-            getKeysFromMap(this.aliasesToIndex)
-         );
-
-         if (foundMatches.length === 0) {
-            return err(`No match found for '${searchString}'`);
-         } else if (foundMatches.length === 1) {
-            // well we got an exact result so lets go back to the old function :)
-            return this.getExactProjectResultByAlias(foundMatches[0]);
+      return this.fetchAll().then((allProjects) => {
+         if (!(allProjects instanceof ProjectCollectionResult)) {
+            console.error("Fetching failed.");
+            return [];
          }
-         // else: lets return the found proposals
 
-         // but: if all found proposals (even if multiple) were pointing to the same directory
-         // => exact match!
+         const matchedProjects = allProjects.projects.filter(
+            ({ absPath, aliases }) => {
+               const searchables = [absPath, ...aliases];
+               const anyMatches = searchables.some((searchable) => {
+                  return searchable.includes(searchString);
+               });
 
-         const allFoundMatchesAsIndices = foundMatches.map((sAlias) => {
-            return this.aliasesToIndex.get(sAlias);
-         });
-
-         const bAllMatchesPointToSame = allFoundMatchesAsIndices.every(
-            (index) => {
-               return index === allFoundMatchesAsIndices[0];
+               return anyMatches;
             }
          );
 
-         if (bAllMatchesPointToSame) {
-            return this.getExactProjectResultByAlias(foundMatches[0]);
-         } // else: list all found occurences
-
-         // now we need to convert indices to uids as indices cannot be
-         // mapped to ProjectListResults
-         const uids = [];
-         allFoundMatchesAsIndices.forEach((iIndex) => {
-            const uid = this.indexToUid.get(iIndex);
-            if (!uids.includes(uid)) {
-               uids.push(uid);
-            }
-         });
-
-         return this.fetchAll(uids).then((projectListResult) => {
-            return new ProjectCollectionResult(projectListResult);
-         });
+         return new ProjectCollectionResult(matchedProjects);
       });
    }
 
@@ -262,7 +239,7 @@ class ProjectDatabase {
       // 1. search string: emb
       // -> result: test-emb-test/ from absPath mapping should be matched.
       // -> if multiple matches are available then list and ask to specify term
-      return this.load().then((_) => {
+      return this.load().then(() => {
          if (this.aliasesToIndex.has(searchString)) {
             return this.getExactProjectResultByAlias(searchString);
          }
@@ -418,7 +395,7 @@ class ProjectDatabase {
 
       return this.load().then((obj) => {
          if (!obj.projects.quickRef[uid]) {
-            return err(`Directory '${absPath}' is not stored.`);
+            return "NOT_STORED";
          }
 
          delete obj.projects.quickRef[uid];

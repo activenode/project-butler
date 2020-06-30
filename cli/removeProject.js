@@ -1,6 +1,6 @@
 const path = require("path"),
-   { OutputController } = require("../utils/OutputController"),
-   shellify = require("../shell/shellify")(OutputController),
+   { logBox } = require("../utils/log"),
+   colors = require("colors/safe"),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {
@@ -16,9 +16,19 @@ module.exports = function (cli, db) {
          const absPath = path.resolve(getCWD());
 
          if (!aliases || aliases.length === 0) {
-            db.removeByDirectory(absPath).then(shellify);
+            db.removeByDirectory(absPath).then((result) => {
+               if (result === "NOT_STORED") {
+                  logBox(colors.bold("The directory is not in your list"));
+               } else {
+                  logBox(
+                     colors.bold(`🦄 Removed this directory from the list`)
+                  );
+               }
+            });
          } else {
-            db.removeByAliases(aliases, cmd.all).then(shellify);
+            db.removeByAliases(aliases, cmd.all).then((_) => {
+               console.log(_);
+            });
          }
       });
 };

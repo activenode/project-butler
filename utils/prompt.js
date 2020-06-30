@@ -1,18 +1,56 @@
-const enquirer = require("enquirer");
+const enquirer = require("enquirer"),
+   config = require("../config");
 
-module.exports.AutoComplete = function ({ name, message, choices, stdout }) {
+function AutoComplete({ name, message, choices, stdout }) {
    return new enquirer.AutoComplete({
       name: name,
       message: message,
       stdout: stdout ? stdout : process.stderr,
       choices: choices,
    }).run();
-};
+}
 
-module.exports.Confirm = function ({ message, initial }) {
+function Confirm({ message, initial }) {
    return new enquirer.Confirm({
       message: message,
       stdout: process.stderr,
       initial: initial ? initial : "Y",
    }).run();
+}
+
+module.exports.AutoCompleteProjects = function (projectsArray = []) {
+   const longestDirectoryNameLength = projectsArray.reduce(
+      (longestInt, { directoryName }) => {
+         return longestInt > directoryName.length
+            ? longestInt
+            : directoryName.length;
+      },
+      0
+   );
+
+   return AutoComplete({
+      name: "project",
+      message: "Choose a project (type for autocompletion)",
+      choices: projectsArray.map(({ absPath, directoryName, aliases }) => {
+         const homeDirRx = new RegExp("^" + config.homedir, "i");
+         return {
+            value: {
+               absPath,
+               directoryName,
+               aliases,
+               toString: function () {
+                  return absPath; // we need the toString method since enquirer will call value.toString()
+               },
+            },
+            message: `=> ${aliases[0].padEnd(
+               longestDirectoryNameLength,
+               " "
+            )}  ${absPath.replace(homeDirRx, "~")}`,
+         };
+      }),
+   });
 };
+
+module.exports.AutoComplete = AutoComplete;
+
+module.exports.Confirm = Confirm;

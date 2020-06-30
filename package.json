@@ -1,28 +1,29 @@
 {
-  "name": "project-butler",
-  "version": "0.7.0",
-  "description": "A simple but effective PM for your CLI",
-  "main": "bin.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/activenode/project-butler.git"
-  },
-  "bin": "./bin/project-butler",
-  "scripts": {
-    "postinstall2": "npx nexe bin.js --fakeArgv true -t 10.13.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler && echo '---' && bin/project-butler --install"
-  },
-  "author": "David Lorenz <info@activenode>",
-  "license": "MIT",
-  "dependencies": {
-    "cli-columns": "^3.1.2",
-    "colors": "^1.4.0",
-    "commander": "^2.9.0",
-    "enquirer": "^2.3.5",
-    "nexe": "^3.3.2",
-    "os-homedir": "^1.0.2"
-  },
-  "engines": {
-    "node": ">=10.9.0"
-  },
-  "devDependencies": {}
+   "name": "project-butler",
+   "version": "0.7.0",
+   "description": "A simple but effective PM for your CLI",
+   "main": "bin.js",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/activenode/project-butler.git"
+   },
+   "bin": "./bin/project-butler",
+   "scripts": {
+      "start": "echo 'start'",
+      "postinstall2": "npx nexe bin.js --fakeArgv true -t 10.13.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler && echo '---' && bin/project-butler --install"
+   },
+   "author": "David Lorenz <info@activenode>",
+   "license": "MIT",
+   "dependencies": {
+      "cli-columns": "^3.1.2",
+      "colors": "^1.4.0",
+      "commander": "^2.9.0",
+      "enquirer": "^2.3.5",
+      "nexe": "^3.3.2",
+      "os-homedir": "^1.0.2"
+   },
+   "engines": {
+      "node": ">=10.9.0"
+   },
+   "devDependencies": {}
 }

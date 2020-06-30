@@ -1,10 +1,10 @@
+const { log } = require("util");
+
 const path = require("path"),
    { OutputController } = require("../utils/OutputController"),
-   shellify = require("../shell/shellify")(OutputController),
-   {
-      CommandWrapper,
-      ProjectCollectionResult,
-   } = require("../db/dbResultModels"),
+   colors = require("colors/safe"),
+   { ProjectCollectionResult } = require("../db/dbResultModels"),
+   { AutoCompleteProjects } = require("../utils/prompt"),
    parsePackageJson = require("../utils/parsePackageJson"),
    getCWD = process.cwd;
 
@@ -35,29 +35,27 @@ const openProjectOrCallAction = (
 
          if (potentialNpmScriptToExecute) {
             bCommandCalled = true;
-            // TODO: refactor
-            shellify(new CommandWrapper(`npm run ${projectNameOrAction}`));
+            OutputController.shell().command(`npm run ${projectNameOrAction}`);
          }
       }
 
       if (!bCommandCalled) {
-         // didnt find any fitting command so search for project-fit
-         //db.findBestMatch(aliasOrName).then(shellify);
-         //tryOpenProjectByAliasOrName(projectNameOrAction);
-
          db.findBestMatch(projectNameOrAction).then((result) => {
             const isProjectResult = result instanceof ProjectCollectionResult;
             if (isProjectResult && !result.isEmpty()) {
-               console.log("non empty result", result);
+               AutoCompleteProjects(result.projects);
             } else if (isProjectResult) {
-               console.log("no project found");
+               console.log(
+                  `'${colors.bold(
+                     projectNameOrAction
+                  )}' didn't match anything. Sorry 🐱`
+               );
             } else {
                console.error(
                   "Did not find a project because errorneous result was retrieved from database"
                );
             }
          });
-         console.log("do db.findBestMatch(aliasOrName).");
       }
    });
 };

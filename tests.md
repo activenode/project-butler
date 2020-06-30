@@ -1,0 +1,13 @@
+-  [ ] install (--install) script works
+-  [ ] adding a directory with `p add`
+-  [ ] adding a non-existing directory with the `-d` flag
+-  [ ] adding a directory with `p add` that already was added
+-  [ ] adding a directory with `p add -d existing-alias` where `existing-alias` is already assigned to a different directory
+-  [ ] removing a directory with `p remove`
+-  [ ] removing a directory with `p remove` that was never added
+-  [ ] `p bestmatch` to find the best match of `bestmatch-123`
+-  [ ] `p command` whilst in an added project that contains a `package.json` and has a `command` script?
+   -  potentially change to `p :command` or `p r start` as `p run start`
+-  [ ] remove aliases e.g. `p remove alias1`
+-  [ ] remove multiple aliases e.g. `p remove alias1 alias2`
+-  [] remove everything but by given alias `p remove --all alias1`

@@ -1,8 +1,7 @@
 const { OutputController } = require("../../utils/OutputController"),
-   { AutoComplete, Confirm } = require("../../utils/prompt"),
+   { AutoCompleteProjects, Confirm } = require("../../utils/prompt"),
    { log, logErr } = require("../../utils/log"),
    fs = require("fs"),
-   config = require("../../config"),
    { ProjectCollectionResult } = require("../../db/dbResultModels");
 
 module.exports = function (cli, db, flags) {
@@ -11,39 +10,7 @@ module.exports = function (cli, db, flags) {
          throw new Error("Invalid Result type");
       }
 
-      const projectsArray = dbResult.projects;
-
-      const longestDirectoryNameLength = projectsArray.reduce(
-         (longestInt, { directoryName }) => {
-            return longestInt > directoryName.length
-               ? longestInt
-               : directoryName.length;
-         },
-         0
-      );
-
-      AutoComplete({
-         name: "project",
-         message: "Choose a project (type for autocompletion)",
-         choices: projectsArray.map(({ absPath, directoryName, aliases }) => {
-            const homeDirRx = new RegExp("^" + config.homedir, "i");
-            return {
-               value: {
-                  absPath,
-                  directoryName,
-                  aliases,
-                  toString: function () {
-                     return absPath; // we need the toString method since enquirer will call value.toString()
-                  },
-               },
-               // name: absPath,
-               message: `${directoryName.padEnd(
-                  longestDirectoryNameLength,
-                  " "
-               )} ${absPath.replace(homeDirRx, "~")}`,
-            };
-         }),
-      })
+      AutoCompleteProjects(dbResult.projects)
          .then(({ absPath }) => {
             if (!fs.existsSync(absPath)) {
                log("--------------------");
