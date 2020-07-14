@@ -18,7 +18,7 @@
     "commander": "^2.9.0",
     "os-homedir": "^1.0.2",
     "prompts": "^2.3.1",
-    "nexe": "^3.3.2"
+    "nexe": "^3.3.3"
   },
   "engines": {
     "node": ">=10.9.0"
