@@ -41,12 +41,15 @@ class OutputController {
    }
 
    static shell() {
+      const shellEvalDetectionComment = '#shell \n';
+      const c = shellEvalDetectionComment;
+
       return {
          cd: function (cdPath) {
-            OutputController.writeToActualStdout(`cd ${cdPath}`);
+            OutputController.writeToActualStdout(`${c}cd ${cdPath}`);
          },
          command: function (rawCommand) {
-            OutputController.writeToActualStdout(rawCommand);
+            OutputController.writeToActualStdout(`${c}${rawCommand}`);
          },
       };
    }
