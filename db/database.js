@@ -1,6 +1,4 @@
 const {
-   ProjectListResult,
-   // ---------------------------
    ProjectAddSuccess,
    ProjectUpdateSuccess,
    ProjectCollectionResult,
@@ -11,22 +9,6 @@ let log = function () {
 log.json = (_logdata) => log(JSON.stringify(_logdata));
 const PATH_DELIMITER = ":";
 const EMPTY_STRUCT = { projects: { quickRef: {} }, _settings: { _i: 0 } };
-
-// function getKeysFromMap(m) {
-//    return Array.from(m || new Map()).map((keyValueArr) => {
-//       return keyValueArr[0];
-//    });
-// }
-
-// function matchesInArray(searchString, arr) {
-//    return arr.filter((value) => {
-//       if (value.replace(searchString, "") !== value) {
-//          // contained it, return with TRUE
-//          return true;
-//       }
-//       return false;
-//    });
-// }
 
 class ProjectDatabase {
    /**

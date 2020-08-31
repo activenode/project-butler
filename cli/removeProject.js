@@ -18,10 +18,10 @@ module.exports = function (cli, db) {
          if (!aliases || aliases.length === 0) {
             db.removeByDirectory(absPath).then((result) => {
                if (result === "NOT_STORED") {
-                  logBox(colors.bold("The directory is not in your list"));
+                  logBox(colors.bold("Directory is not in part of your project list"));
                } else {
                   logBox(
-                     colors.bold(`🦄 Removed this directory from the list`)
+                     colors.bold(`🦄 Removed this directory from the project list`)
                   );
                }
             });

@@ -4,6 +4,10 @@ function log() {
    console.log.apply(console.log, arguments);
 }
 
+function logDivider() {
+   log("-");
+}
+
 function logBox() {
    console.log("");
    console.log.apply(console.log, arguments);
@@ -27,6 +31,7 @@ function logProjectAliases(projectDirectory, aliases) {
 }
 
 module.exports.log = log;
+module.exports.logDivider = logDivider;
 module.exports.logErr = logErr;
 module.exports.logBox = logBox;
 module.exports.logProjectAliases = logProjectAliases;
