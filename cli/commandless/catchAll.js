@@ -1,6 +1,7 @@
 const { OutputController } = require("../../utils/OutputController"),
    { AutoCompleteProjects, Confirm } = require("../../utils/prompt"),
-   { log, logErr } = require("../../utils/log"),
+   { log, logErr, logDivider, logBox } = require("../../utils/log"),
+   colors = require("colors/safe"),
    fs = require("fs"),
    { ProjectCollectionResult } = require("../../db/dbResultModels");
 
@@ -10,13 +11,20 @@ module.exports = function (cli, db, flags) {
          throw new Error("Invalid Result type");
       }
 
+      if (dbResult.projects.length === 0) {
+         logBox(`Howdy 👻. ${colors.bold('I could not find existing projects')}. Try '--help' to see how to add one.`);
+         return;
+      }
+
+      logDivider();
+
       AutoCompleteProjects(dbResult.projects)
          .then(({ absPath }) => {
+            logDivider();
             if (!fs.existsSync(absPath)) {
-               log("--------------------");
                Confirm({
                   message:
-                     "ℹ️  The directory is gone! Remove from butler list?  ",
+                     "ℹ️  The directory is is not on your system anymore! Remove from butler list?  ",
                })
                   .then((bool) => {
                      if (!bool) {
@@ -38,6 +46,7 @@ module.exports = function (cli, db, flags) {
 
                const normalizedPath = absPath.replace(" ", "\\ ");
                OutputController.shell().cd(normalizedPath);
+               logDivider();
             }
          })
          .catch(logErr);
