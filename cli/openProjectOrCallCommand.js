@@ -29,7 +29,7 @@ const openProjectOrCallAction = (
          const packageJson = parsePackageJson(
             `${currentWorkingDirectoryAbsPath}/package.json`
          );
-         const potentialNpmScriptToExecute = packageJson.getScript(
+         const potentialNpmScriptToExecute = packageJson._getScript(
             projectNameOrAction
          );
 
@@ -46,9 +46,9 @@ const openProjectOrCallAction = (
                AutoCompleteProjects(result.projects);
             } else if (isProjectResult) {
                console.log(
-                  `'${colors.bold(
+                  `Tried to find a project matching '${colors.bold(
                      projectNameOrAction
-                  )}' didn't match anything. Sorry 🐱`
+                  )}' but could not find any 🐱`
                );
             } else {
                console.error(

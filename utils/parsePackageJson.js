@@ -5,7 +5,7 @@ function parsePackageJson(packageJsonPath) {
 
     let packageJson = { ...jsonObj };
 
-    packageJson.getScript = scriptName => {
+    packageJson._getScript = scriptName => {
         if (packageJson.scripts && packageJson.scripts[scriptName]) {
             return packageJson.scripts[scriptName];
         } else {
