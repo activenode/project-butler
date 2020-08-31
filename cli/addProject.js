@@ -35,7 +35,7 @@ module.exports = function (cli, db) {
                log("");
                if (dbResult instanceof ProjectAddSuccess) {
                   logBox(
-                     ` 😌 Successfully added the project [${colors.bold.inverse(
+                     ` 😌  Successfully added the project [${colors.bold.inverse(
                         dirname
                      )}] `
                   );
@@ -44,7 +44,7 @@ module.exports = function (cli, db) {
                      dbResult.projectDetails.aliases
                   );
                } else if (dbResult instanceof ProjectUpdateSuccess) {
-                  log(" 👋 Successfully updated the project ");
+                  log(" 👋  Successfully updated the project ");
                   logProjectAliases(
                      dbResult.projectDetails.absPath,
                      dbResult.projectDetails.aliases
