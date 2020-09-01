@@ -1,6 +1,6 @@
 {
    "name": "project-butler",
-   "version": "0.7.0",
+   "version": "1.0.0-alpha1",
    "description": "A simple but effective PM for your CLI",
    "main": "bin.js",
    "repository": {
@@ -10,7 +10,7 @@
    "bin": "./bin/project-butler",
    "scripts": {
       "start": "echo 'start'",
-      "postinstall2": "npx nexe bin.js --fakeArgv true -t 10.13.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler && echo '---' && bin/project-butler --install"
+      "postinstall": "npx nexe bin.js --fakeArgv true -t 10.13.0 -o bin/bin && rm -f bin/project-butler && mv bin/bin bin/project-butler && echo '---' && bin/project-butler --install"
    },
    "author": "David Lorenz <info@activenode>",
    "license": "MIT",
