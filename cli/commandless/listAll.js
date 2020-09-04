@@ -1,6 +1,12 @@
 const { OutputController } = require("../../utils/OutputController"),
    { AutoCompleteProjects, Confirm } = require("../../utils/prompt"),
-   { log, logErr, logDivider, logBox } = require("../../utils/log"),
+   {
+      log,
+      logErr,
+      logDivider,
+      logBox,
+      logDirectorySwitchInfo,
+   } = require("../../utils/log"),
    colors = require("colors/safe"),
    fs = require("fs"),
    { ProjectCollectionResult } = require("../../db/dbResultModels");
@@ -12,11 +18,13 @@ module.exports = function (cli, db, flags) {
       }
 
       if (dbResult.projects.length === 0) {
-         logBox(`Howdy 👻. ${colors.bold('I could not find existing projects')}. Try '--help' to see how to add one.`);
+         logBox(
+            `${colors.bold(
+               "I could not find any existing projects 👻"
+            )}. Try '--help' to see how to add one.`
+         );
          return;
       }
-
-      logDivider();
 
       AutoCompleteProjects(dbResult.projects)
          .then(({ absPath }) => {
@@ -42,11 +50,8 @@ module.exports = function (cli, db, flags) {
                   })
                   .catch(logErr);
             } else {
-               log("Switching to the directory now");
-
-               const normalizedPath = absPath.replace(" ", "\\ ");
-               OutputController.shell().cd(normalizedPath);
-               logDivider();
+               logDirectorySwitchInfo(absPath);
+               OutputController.shell().cd(absPath);
             }
          })
          .catch(logErr);

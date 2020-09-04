@@ -20,7 +20,7 @@ const cli = require("commander"),
    cli_returnShellScript = require("./cli/commandless/shellScript"),
    cli_installAliasInShellRc = require("./cli/commandless/installAliasInShellRc"),
    cli_cleanup = require("./cli/commandless/cleanup"),
-   cli_catchAll = require("./cli/commandless/catchAll");
+   cli_listAll = require("./cli/commandless/listAll");
 
 // gotta make sure we can write to the Database! Safety first!
 ensureStorageExistence();
@@ -39,6 +39,9 @@ cli.version(VERSION, "-v, --version", "output the current version")
 
 setupCommand_addProject(cli, db);
 setupCommand_removeProject(cli, db);
+
+// The following will setup the command 'project-butler *'
+// the start will only trigger for at least one character
 setupCommand_openProjectOrCallCommand(cli, db);
 
 // parse the cli arguments
@@ -52,7 +55,8 @@ if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
       cli_returnShellScript, // option -s --shell-script
       cli_installAliasInShellRc, // option -i --install-alias
       cli_cleanup, // option -c --clean --cleanup
-      cli_catchAll, // if nothing was met this will execute
+      cli_listAll, // if nothing was met this will execute
+      // its worth noting that 'catchAll' will not catch
    ];
 
    // * We follow the same approach as "express" by waiting for the previous "next()" function

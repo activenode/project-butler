@@ -9,18 +9,22 @@ function logDivider() {
 }
 
 function logBox() {
-   console.log("");
+   console.log(" ");
    console.log.apply(console.log, arguments);
-   console.log("---");
+   console.log(" ");
 }
 
 function logErr() {
    console.error.apply(console.error, arguments);
 }
 
+function logDirectorySwitchInfo(cdPath) {
+   return log(`➡️ Switching to ${colors.inverse(`${cdPath}`)}`);
+}
+
 function logProjectAliases(projectDirectory, aliases) {
    log(
-      `Aliases for ${colors.bold.inverse(projectDirectory)}: \n${aliases
+      `Aliases for ${colors.bold.inverse(projectDirectory)}: ${aliases
          .map((aliasString) => {
             return `\n ${colors.bold(`＋ ${aliasString} `)}`;
          })
@@ -35,3 +39,4 @@ module.exports.logDivider = logDivider;
 module.exports.logErr = logErr;
 module.exports.logBox = logBox;
 module.exports.logProjectAliases = logProjectAliases;
+module.exports.logDirectorySwitchInfo = logDirectorySwitchInfo;

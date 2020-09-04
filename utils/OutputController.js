@@ -1,3 +1,5 @@
+const normalizePathString = require("./normalizePathString");
+
 const OUTPUT_MODES = {
    NORMAL: "NORMAL",
    STDOUT_TO_STDERR: "STDOUT_TO_STDERR",
@@ -41,12 +43,13 @@ class OutputController {
    }
 
    static shell() {
-      const shellEvalDetectionComment = '#shell \n';
+      const shellEvalDetectionComment = "#shell \n";
       const c = shellEvalDetectionComment;
 
       return {
-         cd: function (cdPath) {
-            OutputController.writeToActualStdout(`${c}cd ${cdPath}`);
+         cd: function (cdPath, normalizePath = true) {
+            let path = !normalizePath ? cdPath : normalizePathString(cdPath);
+            OutputController.writeToActualStdout(`${c}cd ${path}`);
          },
          command: function (rawCommand) {
             OutputController.writeToActualStdout(`${c}${rawCommand}`);

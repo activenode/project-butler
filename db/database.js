@@ -2,6 +2,7 @@ const {
    ProjectAddSuccess,
    ProjectUpdateSuccess,
    ProjectCollectionResult,
+   InstantProjectResult,
 } = require("./dbResultModels");
 let log = function () {
    console.log(Array.from(arguments));
