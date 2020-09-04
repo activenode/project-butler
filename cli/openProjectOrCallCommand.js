@@ -6,7 +6,12 @@ const path = require("path"),
       InstantProjectResult,
    } = require("../db/dbResultModels"),
    { AutoCompleteProjects } = require("../utils/prompt"),
-   { logBox, logErr, logDirectorySwitchInfo } = require("../utils/log"),
+   {
+      LOG_TEXTS,
+      logBox,
+      logErr,
+      logDirectorySwitchInfo,
+   } = require("../utils/log"),
    listAll = require("./commandless/listAll"),
    parsePackageJson = require("../utils/parsePackageJson"),
    getCWD = process.cwd;
@@ -16,11 +21,13 @@ function matchAndOpenProject(db, projectNameOrAction) {
       const isProjectResult = result instanceof ProjectCollectionResult;
       const isInstantResult = result instanceof InstantProjectResult;
 
-      if (isInstantResult) {
-         const absPath = result.project.absPath;
+      if ((isInstantResult || isProjectResult) && result.isSingleResult()) {
+         const project = result.getFirstResult();
+         const absPath = project.absPath;
          logDirectorySwitchInfo(absPath);
-         OutputController.shell().cd(result.project.absPath);
+         OutputController.shell().cd(project.absPath);
       } else if (isProjectResult && !result.isEmpty()) {
+         logBox(LOG_TEXTS.FOUND_MULTIPLE_PLEASE_CHOOSE);
          AutoCompleteProjects(result.projects);
       } else if (isProjectResult) {
          logBox(
@@ -73,7 +80,7 @@ const openProjectOrCallAction = (
          }
 
          if (!bCommandCalled) {
-            return matchAndOpenProject(projectNameOrAction);
+            return matchAndOpenProject(db, projectNameOrAction);
          }
       });
 };

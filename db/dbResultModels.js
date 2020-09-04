@@ -28,7 +28,15 @@ class ProjectCollectionResult {
    }
 
    isEmpty() {
-      return this._projects.length === 0;
+      return this.projects.length === 0;
+   }
+
+   isSingleResult() {
+      return this.projects.length === 1;
+   }
+
+   getFirstResult() {
+      return this.projects[0];
    }
 }
 
@@ -37,10 +45,11 @@ class InstantProjectResult {
       if ("absPath" in project) {
          this._project = project;
       } else if (
-         project instanceof ProjectCollectionResult &&
+         (project instanceof ProjectCollectionResult ||
+            project instanceof InstantProjectResult) &&
          !project.isEmpty()
       ) {
-         this._project = project.projects[0];
+         this._project = project.getFirstResult();
       } else {
          throw new Error(
             "Invalid object provided to constructor of InstantProjectResult"
@@ -50,6 +59,20 @@ class InstantProjectResult {
 
    get project() {
       return this._project;
+   }
+
+   isEmpty() {
+      // a single / instant result is never treated empty
+      return false;
+   }
+
+   isSingleResult() {
+      // is a single result, so yes
+      return true;
+   }
+
+   getFirstResult() {
+      return this.project;
    }
 }
 
