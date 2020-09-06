@@ -8,6 +8,7 @@ const path = require("path"),
    { AutoCompleteProjects } = require("../utils/prompt"),
    {
       LOG_TEXTS,
+      log,
       logBox,
       logErr,
       logDirectorySwitchInfo,
@@ -27,8 +28,22 @@ function matchAndOpenProject(db, projectNameOrAction) {
          logDirectorySwitchInfo(absPath);
          OutputController.shell().cd(project.absPath);
       } else if (isProjectResult && !result.isEmpty()) {
-         logBox(LOG_TEXTS.FOUND_MULTIPLE_PLEASE_CHOOSE);
-         AutoCompleteProjects(result.projects);
+         const ac = AutoCompleteProjects(result.projects, {
+            run: false,
+         });
+
+         logBox(`-- ${LOG_TEXTS.FOUND_MULTIPLE_PLEASE_CHOOSE} --`);
+
+         ac.run()
+            .then(({ absPath }) => {
+               logDirectorySwitchInfo(absPath);
+               OutputController.shell().cd(absPath);
+            })
+            .catch(() => {
+               ac.clear();
+               // process.stdout.write("\r\r");
+               log(LOG_TEXTS.SELECTION_CANCELLED);
+            });
       } else if (isProjectResult) {
          logBox(
             `✖ Tried to find a project matching '${colors.bold(

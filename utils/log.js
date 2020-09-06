@@ -1,8 +1,8 @@
 const colors = require("colors/safe");
 
 const LOG_TEXTS = {
-   FOUND_MULTIPLE_PLEASE_CHOOSE:
-      "Found multiple entries, please select one  🍪",
+   FOUND_MULTIPLE_PLEASE_CHOOSE: "✳️ Found multiple entries, please select one",
+   SELECTION_CANCELLED: "You did not select anything",
 };
 
 function log() {
@@ -24,7 +24,7 @@ function logErr() {
 }
 
 function logDirectorySwitchInfo(cdPath) {
-   return log(`➡️ Switching to ${colors.inverse(`${cdPath}`)}`);
+   return log(`➡️ Switching to ${colors.bold(`${cdPath}`)}`);
 }
 
 function logProjectAliases(projectDirectory, aliases) {

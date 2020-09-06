@@ -1,13 +1,19 @@
 const enquirer = require("enquirer"),
    config = require("../config");
 
-function AutoComplete({ name, message, choices, stdout }) {
-   return new enquirer.AutoComplete({
+function AutoComplete({ name, message, choices, stdout, run = true }) {
+   const autoComplete = new enquirer.AutoComplete({
       name: name,
       message: message,
       stdout: stdout ? stdout : process.stderr,
       choices: choices,
-   }).run();
+   });
+
+   if (run) {
+      return autoComplete.run();
+   }
+
+   return autoComplete;
 }
 
 function Confirm({ message, initial }) {
@@ -18,7 +24,7 @@ function Confirm({ message, initial }) {
    }).run();
 }
 
-module.exports.AutoCompleteProjects = function (projectsArray = []) {
+module.exports.AutoCompleteProjects = function (projectsArray = [], opts = {}) {
    const longestDirectoryNameLength = projectsArray.reduce(
       (longestInt, { directoryName }) => {
          return longestInt > directoryName.length
@@ -48,9 +54,9 @@ module.exports.AutoCompleteProjects = function (projectsArray = []) {
             )}  ${absPath.replace(homeDirRx, "~")}`,
          };
       }),
+      ...opts,
    });
 };
 
 module.exports.AutoComplete = AutoComplete;
-
 module.exports.Confirm = Confirm;
