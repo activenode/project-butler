@@ -2,10 +2,18 @@ const path = require("path"),
    getCWD = process.cwd,
    fs = require("fs"),
    colors = require("colors/safe"),
-   { log, logErr, logProjectAliases, logBox } = require("../utils/log"),
+   {
+      LOG_TEXTS,
+      log,
+      logErr,
+      logProjectAliases,
+      logBox,
+      logAliasesTakenMessage,
+   } = require("../utils/log"),
    {
       ProjectAddSuccess,
       ProjectUpdateSuccess,
+      AliasesAlreadyTakenError,
    } = require("../db/dbResultModels");
 
 module.exports = function (cli, db) {
@@ -23,7 +31,9 @@ module.exports = function (cli, db) {
             }
          } catch (e) {
             logErr(
-               `🐼 Sorry Pandabear! The given path to ${absPath} is not a directory`
+               `\n${colors.red(`✖`)} The given path to ${colors.bold(
+                  absPath
+               )} is not a directory 🐼`
             );
             return;
          }
@@ -49,13 +59,22 @@ module.exports = function (cli, db) {
                      dbResult.projectDetails.absPath,
                      dbResult.projectDetails.aliases
                   );
+               } else if (dbResult instanceof AliasesAlreadyTakenError) {
+                  log(
+                     `You wanted to map ${absPath} with ${dbResult.project.aliases}`
+                  );
+                  logAliasesTakenMessage(dbResult.aliasesTaken);
                } else {
-                  throw new Error(`Unknown Error occurred`);
+                  throw new Error(LOG_TEXTS.UNKOWN_ERROR);
                }
             })
             .catch((error) => {
                if (error instanceof Error) {
-                  logErr(error.message);
+                  logErr(error);
+               } else {
+                  logErr(
+                     `${LOG_TEXTS.UNKNOWN_ERROR} - whilst adding a project`
+                  );
                }
             });
       });
