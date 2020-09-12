@@ -4,7 +4,6 @@ const { OutputController } = require("../../utils/OutputController"),
       log,
       logErr,
       logDivider,
-      logBox,
       logDirectorySwitchInfo,
    } = require("../../utils/log"),
    colors = require("colors/safe"),
@@ -18,7 +17,7 @@ module.exports = function (cli, db, flags) {
       }
 
       if (dbResult.projects.length === 0) {
-         logBox(
+         log(
             `${colors.bold(
                "I could not find any existing projects 👻"
             )}. Try '--help' to see how to add one.`

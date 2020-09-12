@@ -14,18 +14,12 @@ function logDivider() {
    log("-");
 }
 
-function logBox() {
-   console.log(" ");
-   console.log.apply(console.log, arguments);
-   console.log(" ");
-}
-
 function logErr() {
    console.error.apply(console.error, arguments);
 }
 
 function logDirectorySwitchInfo(cdPath) {
-   return log(`➡️ Switching to ${colors.bold(`${cdPath}`)}`);
+   return log(`  ➡️ ${colors.bold(`${cdPath}`)}`);
 }
 
 function logProjectAliases(projectDirectory, aliases) {
@@ -56,7 +50,7 @@ function logAliasesTakenMessage(aliasesTaken /* Array<{alias, absPath}> */) {
 module.exports.log = log;
 module.exports.logDivider = logDivider;
 module.exports.logErr = logErr;
-module.exports.logBox = logBox;
+\;
 module.exports.logProjectAliases = logProjectAliases;
 module.exports.logDirectorySwitchInfo = logDirectorySwitchInfo;
 module.exports.logAliasesTakenMessage = logAliasesTakenMessage;
