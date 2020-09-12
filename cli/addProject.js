@@ -7,7 +7,6 @@ const path = require("path"),
       log,
       logErr,
       logProjectAliases,
-      logBox,
       logAliasesTakenMessage,
    } = require("../utils/log"),
    {
@@ -44,11 +43,12 @@ module.exports = function (cli, db) {
             .then((dbResult) => {
                log("");
                if (dbResult instanceof ProjectAddSuccess) {
-                  logBox(
-                     ` 😌  Successfully added the project [${colors.bold.inverse(
+                  log(
+                     `😌  Successfully added the project ${colors.bold(
                         dirname
-                     )}] `
+                     )} `
                   );
+                  log("");
                   logProjectAliases(
                      dbResult.projectDetails.absPath,
                      dbResult.projectDetails.aliases
