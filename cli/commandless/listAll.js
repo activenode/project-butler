@@ -1,11 +1,6 @@
 const { OutputController } = require("../../utils/OutputController"),
    { AutoCompleteProjects, Confirm } = require("../../utils/prompt"),
-   {
-      log,
-      logErr,
-      logDivider,
-      logDirectorySwitchInfo,
-   } = require("../../utils/log"),
+   { log, logErr, logDirectorySwitchInfo } = require("../../utils/log"),
    colors = require("colors/safe"),
    fs = require("fs"),
    { ProjectCollectionResult } = require("../../db/dbResultModels");
@@ -27,7 +22,7 @@ module.exports = function (cli, db, flags) {
 
       AutoCompleteProjects(dbResult.projects)
          .then(({ absPath }) => {
-            logDivider();
+            log("");
             if (!fs.existsSync(absPath)) {
                Confirm({
                   message:

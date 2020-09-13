@@ -10,10 +10,6 @@ function log() {
    console.log.apply(console.log, arguments);
 }
 
-function logDivider() {
-   log("-");
-}
-
 function logErr() {
    console.error.apply(console.error, arguments);
 }
@@ -48,9 +44,7 @@ function logAliasesTakenMessage(aliasesTaken /* Array<{alias, absPath}> */) {
 }
 
 module.exports.log = log;
-module.exports.logDivider = logDivider;
 module.exports.logErr = logErr;
-\;
 module.exports.logProjectAliases = logProjectAliases;
 module.exports.logDirectorySwitchInfo = logDirectorySwitchInfo;
 module.exports.logAliasesTakenMessage = logAliasesTakenMessage;
