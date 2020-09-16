@@ -1,6 +1,11 @@
 const { OutputController } = require("../../utils/OutputController"),
    { AutoCompleteProjects, Confirm } = require("../../utils/prompt"),
-   { log, logErr, logDirectorySwitchInfo } = require("../../utils/log"),
+   {
+      log,
+      logErr,
+      logDirectorySwitchInfo,
+      LOG_TEXTS,
+   } = require("../../utils/log"),
    colors = require("colors/safe"),
    fs = require("fs"),
    { ProjectCollectionResult } = require("../../db/dbResultModels");
@@ -42,12 +47,18 @@ module.exports = function (cli, db, flags) {
                            );
                      }
                   })
-                  .catch(logErr);
+                  .catch(() => {});
             } else {
                logDirectorySwitchInfo(absPath);
                OutputController.shell().cd(absPath);
             }
          })
-         .catch(logErr);
+         .catch((err) => {
+            if (err) {
+               logErr(err);
+            } else {
+               log(LOG_TEXTS.NO_SELECTION_MADE);
+            }
+         });
    });
 };
