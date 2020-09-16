@@ -14,6 +14,13 @@ class AliasesAlreadyTakenError extends ExpectedError {
    }
 }
 
+class AliasesNotFoundError extends ExpectedError {
+   constructor(aliases) {
+      super();
+      this.aliases = this.aliases;
+   }
+}
+
 class ProjectAddSuccess {
    constructor(projectDetails) {
       this._projectDetails = projectDetails;
@@ -98,4 +105,5 @@ module.exports = {
    ProjectCollectionResult,
    InstantProjectResult,
    AliasesAlreadyTakenError,
+   AliasesNotFoundError,
 };

@@ -1,7 +1,8 @@
 const path = require("path"),
-   { log } = require("../utils/log"),
+   { log, logErr, LOG_TEXTS } = require("../utils/log"),
    colors = require("colors/safe"),
    isEmpty = require("../utils/isEmpty"),
+   { AliasesNotFoundError } = require("../db/dbResultModels"),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {
@@ -33,10 +34,11 @@ module.exports = function (cli, db) {
                }
             });
          } else {
-            // ! TODO: fix -> when alias was not found it fails fatally
             // TODO: fix that it outputs a console.log of the remaining database when deletion success is given
             db.removeByAliases(aliases, cmd.all).then((_) => {
-               console.log(_);
+               if (_ instanceof AliasesNotFoundError) {
+                  logErr(LOG_TEXTS.ALIASES_NOT_FOUND_ERROR);
+               }
             });
          }
       });

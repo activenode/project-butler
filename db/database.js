@@ -4,6 +4,7 @@ const {
    ProjectCollectionResult,
    InstantProjectResult,
    AliasesAlreadyTakenError,
+   AliasesNotFoundError,
 } = require("./dbResultModels");
 
 const { log, logErr } = require("../utils/log");
@@ -331,7 +332,7 @@ class ProjectDatabase {
          );
 
          if (!existingAliases.length) {
-            return err("None of the given aliases could be found");
+            return new AliasesNotFoundError(aliases);
          }
 
          const affectedUidsArr = Array.from(
