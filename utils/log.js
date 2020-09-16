@@ -4,6 +4,8 @@ const LOG_TEXTS = {
    FOUND_MULTIPLE_PLEASE_CHOOSE: "✳️ Found multiple entries, please select one",
    SELECTION_CANCELLED: "You did not select anything",
    UNKOWN_ERROR: "An unknown error occured",
+   ALIASES_NOT_FOUND_ERROR: "None of the given aliases were found",
+   NO_SELECTION_MADE: "No selection was made",
 };
 
 function log() {
@@ -11,7 +13,9 @@ function log() {
 }
 
 function logErr() {
-   console.error.apply(console.error, arguments);
+   const args = Array.from(arguments);
+   const output = colors.bgBlack.red.inverse(` ${args.join("")} `);
+   console.error.call(console.error, output);
 }
 
 function logDirectorySwitchInfo(cdPath) {
