@@ -48,7 +48,7 @@ module.exports.AutoCompleteProjects = function (projectsArray = [], opts = {}) {
                   return absPath; // we need the toString method since enquirer will call value.toString()
                },
             },
-            message: `=> ${aliases[0].padEnd(
+            message: `▹ ${aliases[0].padEnd(
                longestDirectoryNameLength,
                " "
             )}  ${absPath.replace(homeDirRx, "~")}`,

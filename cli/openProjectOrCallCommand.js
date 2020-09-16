@@ -6,13 +6,7 @@ const path = require("path"),
       InstantProjectResult,
    } = require("../db/dbResultModels"),
    { AutoCompleteProjects } = require("../utils/prompt"),
-   {
-      LOG_TEXTS,
-      log,
-      logBox,
-      logErr,
-      logDirectorySwitchInfo,
-   } = require("../utils/log"),
+   { LOG_TEXTS, log, logErr, logDirectorySwitchInfo } = require("../utils/log"),
    listAll = require("./commandless/listAll"),
    parsePackageJson = require("../utils/parsePackageJson"),
    getCWD = process.cwd;
@@ -32,7 +26,7 @@ function matchAndOpenProject(db, projectNameOrAction) {
             run: false,
          });
 
-         logBox(`-- ${LOG_TEXTS.FOUND_MULTIPLE_PLEASE_CHOOSE} --`);
+         log(`${LOG_TEXTS.FOUND_MULTIPLE_PLEASE_CHOOSE}`);
 
          ac.run()
             .then(({ absPath }) => {
@@ -45,11 +39,12 @@ function matchAndOpenProject(db, projectNameOrAction) {
                log(LOG_TEXTS.SELECTION_CANCELLED);
             });
       } else if (isProjectResult) {
-         logBox(
+         log(
             `✖ Tried to find a project matching '${colors.bold(
                projectNameOrAction
             )}' but could not find any 🐱.`
          );
+         log("");
 
          listAll(null, db, null);
       } else {

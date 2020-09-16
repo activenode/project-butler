@@ -3,9 +3,8 @@ const { OutputController } = require("../../utils/OutputController"),
    {
       log,
       logErr,
-      logDivider,
-      logBox,
       logDirectorySwitchInfo,
+      LOG_TEXTS,
    } = require("../../utils/log"),
    colors = require("colors/safe"),
    fs = require("fs"),
@@ -18,7 +17,7 @@ module.exports = function (cli, db, flags) {
       }
 
       if (dbResult.projects.length === 0) {
-         logBox(
+         log(
             `${colors.bold(
                "I could not find any existing projects 👻"
             )}. Try '--help' to see how to add one.`
@@ -28,7 +27,7 @@ module.exports = function (cli, db, flags) {
 
       AutoCompleteProjects(dbResult.projects)
          .then(({ absPath }) => {
-            logDivider();
+            log("");
             if (!fs.existsSync(absPath)) {
                Confirm({
                   message:
@@ -48,12 +47,18 @@ module.exports = function (cli, db, flags) {
                            );
                      }
                   })
-                  .catch(logErr);
+                  .catch(() => {});
             } else {
                logDirectorySwitchInfo(absPath);
                OutputController.shell().cd(absPath);
             }
          })
-         .catch(logErr);
+         .catch((err) => {
+            if (err) {
+               logErr(err);
+            } else {
+               log(LOG_TEXTS.NO_SELECTION_MADE);
+            }
+         });
    });
 };

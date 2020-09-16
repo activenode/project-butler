@@ -3,11 +3,12 @@ const {
    ProjectUpdateSuccess,
    ProjectCollectionResult,
    InstantProjectResult,
+   AliasesAlreadyTakenError,
+   AliasesNotFoundError,
 } = require("./dbResultModels");
-let log = function () {
-   console.log(Array.from(arguments));
-};
-log.json = (_logdata) => log(JSON.stringify(_logdata));
+
+const { log, logErr } = require("../utils/log");
+
 const PATH_DELIMITER = ":";
 const EMPTY_STRUCT = { projects: { quickRef: {} }, _settings: { _i: 0 } };
 
@@ -198,7 +199,9 @@ class ProjectDatabase {
    findNextBestMatch(searchString) {
       return this.fetchAll().then((allProjects) => {
          if (!(allProjects instanceof ProjectCollectionResult)) {
-            console.error("Fetching failed.");
+            logErr(
+               `Tried to fetch all projects to find the next best match but failed doing so cause the result was not a collection`
+            );
             return [];
          }
 
@@ -279,12 +282,10 @@ class ProjectDatabase {
       );
 
       if (aliasesInUse) {
-         return new ErrorResult().addError(
-            `The following aliases are already in use`,
-            aliasesInUse.map(
-               (aliasObj) => `${aliasObj.alias} => ${aliasObj.absPath}`
-            )
-         );
+         return new AliasesAlreadyTakenError(aliasesInUse, {
+            absPath,
+            aliases,
+         });
       }
 
       //----else:------------
@@ -331,7 +332,7 @@ class ProjectDatabase {
          );
 
          if (!existingAliases.length) {
-            return err("None of the given aliases could be found");
+            return new AliasesNotFoundError(aliases);
          }
 
          const affectedUidsArr = Array.from(

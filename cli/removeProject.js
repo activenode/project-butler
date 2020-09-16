@@ -1,6 +1,8 @@
 const path = require("path"),
-   { logBox } = require("../utils/log"),
+   { log, logErr, LOG_TEXTS } = require("../utils/log"),
    colors = require("colors/safe"),
+   isEmpty = require("../utils/isEmpty"),
+   { AliasesNotFoundError } = require("../db/dbResultModels"),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {
@@ -10,24 +12,33 @@ module.exports = function (cli, db) {
          "If --all param is set it will completely remove the directory from the list with all its aliases"
       )
       .description(
-         "If no alias is provided it will try to delete all aliases from your current directory"
+         "Remove an alias from a project. If no alias is provided it will try to delete all aliases from your current directory and therefore remove the project from the list"
       )
       .action((aliases, cmd) => {
          const absPath = path.resolve(getCWD());
 
-         if (!aliases || aliases.length === 0) {
+         if (isEmpty(aliases)) {
             db.removeByDirectory(absPath).then((result) => {
                if (result === "NOT_STORED") {
-                  logBox(colors.bold("Directory is not in part of your project list"));
+                  log(
+                     `${colors.red(
+                        `✖`
+                     )} Directory is not part of your project list so I cannot remove it:\n  ${absPath}`
+                  );
                } else {
-                  logBox(
-                     colors.bold(`🦄 Removed this directory from the project list`)
+                  log(
+                     colors.bold(
+                        `🦄  Removed this directory from the project list`
+                     )
                   );
                }
             });
          } else {
+            // TODO: fix that it outputs a console.log of the remaining database when deletion success is given
             db.removeByAliases(aliases, cmd.all).then((_) => {
-               console.log(_);
+               if (_ instanceof AliasesNotFoundError) {
+                  logErr(LOG_TEXTS.ALIASES_NOT_FOUND_ERROR);
+               }
             });
          }
       });

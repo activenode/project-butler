@@ -8,6 +8,8 @@ require("./utils/OutputController");
  * the open shell.
  */
 const { version: VERSION } = require("./package.json");
+const colors = require("colors/safe");
+const { log } = require("./utils/log");
 
 const cli = require("commander"),
    ensureStorageExistence = require("./db/ensureStorageExistence"),
@@ -43,6 +45,16 @@ setupCommand_removeProject(cli, db);
 // The following will setup the command 'project-butler *'
 // the start will only trigger for at least one character
 setupCommand_openProjectOrCallCommand(cli, db);
+
+cli.on("--help", () => {
+   log(
+      colors.bold(
+         `\n  😇 project-butler will never manipulate or delete any files with any command. \n    ${colors.reset(
+            "All commands are safe commands."
+         )}`
+      )
+   );
+});
 
 // parse the cli arguments
 const parsedCliArgs = cli.parse(process.argv);

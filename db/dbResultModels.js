@@ -1,3 +1,26 @@
+const colors = require("colors/safe");
+
+class ExpectedError extends Error {
+   constructor(message) {
+      super(message);
+   }
+}
+
+class AliasesAlreadyTakenError extends ExpectedError {
+   constructor(aliasesInUse, { absPath, aliases }) {
+      super("Aliases are taken");
+      this.aliasesTaken = aliasesInUse;
+      this.project = { absPath, aliases };
+   }
+}
+
+class AliasesNotFoundError extends ExpectedError {
+   constructor(aliases) {
+      super();
+      this.aliases = this.aliases;
+   }
+}
+
 class ProjectAddSuccess {
    constructor(projectDetails) {
       this._projectDetails = projectDetails;
@@ -81,4 +104,6 @@ module.exports = {
    ProjectUpdateSuccess,
    ProjectCollectionResult,
    InstantProjectResult,
+   AliasesAlreadyTakenError,
+   AliasesNotFoundError,
 };
