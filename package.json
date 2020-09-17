@@ -1,6 +1,6 @@
 {
    "name": "project-butler",
-   "version": "1.0.0-alpha6",
+   "version": "1.0.0-alpha7",
    "description": "A simple but effective PM for your CLI",
    "main": "bin.js",
    "repository": {
