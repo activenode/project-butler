@@ -63,8 +63,6 @@ const parsedCliArgs = cli.parse(process.argv);
 const potentialCommand = parsedCliArgs.rawArgs[2];
 const commandWasExecuted = ["add", "remove", "cd"].includes(potentialCommand);
 
-// console.log(, "llopts", cli.opts());
-
 if (
    !commandWasExecuted &&
    (!parsedCliArgs.args || parsedCliArgs.args.length == 0)
