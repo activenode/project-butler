@@ -32,6 +32,7 @@ const db = getDatabaseManager();
 
 //----------------------------------------
 cli.version(VERSION, "-v, --version", "output the current version")
+   .name("p")
    .option("-s, --shell-script", "Return the shell script")
    .option("-i, --install", "Tries to install the shell script")
    .option(
