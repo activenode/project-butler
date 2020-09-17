@@ -60,7 +60,13 @@ cli.on("--help", () => {
 // parse the cli arguments
 const parsedCliArgs = cli.parse(process.argv);
 
-if (!parsedCliArgs.args || parsedCliArgs.args.length == 0) {
+const potentialCommand = parsedCliArgs.rawArgs[2];
+const commandWasExecuted = ["add", "remove", "cd"].includes(potentialCommand);
+
+if (
+   !commandWasExecuted &&
+   (!parsedCliArgs.args || parsedCliArgs.args.length == 0)
+) {
    // ! Each of the following functions will only run if the previous one returned Boolean(true)
    // ! This makes them mutual exclusive and the catchAll only runs if the others did not apply
 

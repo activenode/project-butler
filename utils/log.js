@@ -6,6 +6,7 @@ const LOG_TEXTS = {
    UNKOWN_ERROR: "An unknown error occured",
    ALIASES_NOT_FOUND_ERROR: "None of the given aliases were found",
    NO_SELECTION_MADE: "No selection was made",
+   NO_PROJECTS_FOUND: "Could not find any projects",
 };
 
 function log() {
@@ -34,6 +35,20 @@ function logProjectAliases(projectDirectory, aliases) {
    log("");
 }
 
+function logProjectCollection(projectCollection) {
+   if (
+      !projectCollection ||
+      !projectCollection.projects ||
+      !projectCollection.projects.length
+   ) {
+      log(LOG_TEXTS.NO_PROJECTS_FOUND);
+      return;
+   }
+   projectCollection.projects.forEach((project) => {
+      logProjectAliases(project.absPath, project.aliases);
+   });
+}
+
 /**
  * Logs the aliases that are already reserved due of them being taken
  * @param {Array<{alias, absPath}>} aliasesTaken
@@ -52,4 +67,5 @@ module.exports.logErr = logErr;
 module.exports.logProjectAliases = logProjectAliases;
 module.exports.logDirectorySwitchInfo = logDirectorySwitchInfo;
 module.exports.logAliasesTakenMessage = logAliasesTakenMessage;
+module.exports.logProjectCollection = logProjectCollection;
 module.exports.LOG_TEXTS = LOG_TEXTS;
