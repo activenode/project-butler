@@ -4,7 +4,7 @@ const directoryNameProjectButler = ".project-butler";
 const dbRootDirectory = `${homedir}/${directoryNameProjectButler}`;
 
 const shellAliasGetterString = "project-butler -s";
-const shellAliasGetterEvalString = "eval $(project-butler -s)";
+const shellAliasGetterEvalString = 'eval "$(project-butler -s)"';
 
 module.exports = {
    homedir,
