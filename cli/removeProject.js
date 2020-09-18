@@ -9,7 +9,7 @@ const path = require("path"),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {
-   cli.command("remove <aliases...>")
+   cli.command("remove [aliases...]")
       .option(
          "-a, --all",
          "If --all param is set it will completely remove the directory from the list with all its aliases"
