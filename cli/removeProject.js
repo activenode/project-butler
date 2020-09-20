@@ -9,7 +9,7 @@ const path = require("path"),
    getCWD = process.cwd;
 
 module.exports = function (cli, db) {
-   cli.command("remove <aliases...>")
+   cli.command("remove [aliases...]")
       .option(
          "-a, --all",
          "If --all param is set it will completely remove the directory from the list with all its aliases"
@@ -37,7 +37,6 @@ module.exports = function (cli, db) {
                }
             });
          } else {
-            // TODO: fix that it outputs a console.log of the remaining database when deletion success is given
             db.removeByAliases(aliases, cmd.all).then((_) => {
                if (_ instanceof AliasesNotFoundError) {
                   logErr(LOG_TEXTS.ALIASES_NOT_FOUND_ERROR);

@@ -15,6 +15,7 @@ const cli = require("commander"),
    ensureStorageExistence = require("./db/ensureStorageExistence"),
    getDatabaseManager = require("./db/getDatabaseManager"),
    // ------------------------------
+   setupCommand_listAllProjects = require("./cli/listAllProjects"),
    setupCommand_addProject = require("./cli/addProject"),
    setupCommand_removeProject = require("./cli/removeProject"),
    setupCommand_openProjectOrCallCommand = require("./cli/openProjectOrCallCommand"),
@@ -40,6 +41,7 @@ cli.version(VERSION, "-v, --version", "output the current version")
       "Will remove orphaned projects from the list (just call `p --clean`)"
    );
 
+setupCommand_listAllProjects(cli, db);
 setupCommand_addProject(cli, db);
 setupCommand_removeProject(cli, db);
 
@@ -61,7 +63,9 @@ cli.on("--help", () => {
 const parsedCliArgs = cli.parse(process.argv);
 
 const potentialCommand = parsedCliArgs.rawArgs[2];
-const commandWasExecuted = ["add", "remove", "cd"].includes(potentialCommand);
+const commandWasExecuted = ["add", "remove", "cd", "list-all"].includes(
+   potentialCommand
+);
 
 if (
    !commandWasExecuted &&
