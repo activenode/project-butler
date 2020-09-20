@@ -21,6 +21,10 @@
 
 [![asciicast](https://asciinema.org/a/360307.svg)](https://asciinema.org/a/360307)
 
+### Removing aliases and removing projects
+
+[![asciicast](https://asciinema.org/a/360527.svg)](https://asciinema.org/a/360527)
+
 ## Usage as Documentation
 
 ```
