@@ -3,3 +3,4 @@ settings.json
 node_modules
 bin/darwin
 bin/linux
+bin/project-butler

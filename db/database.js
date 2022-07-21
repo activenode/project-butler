@@ -7,6 +7,8 @@ const {
    AliasesNotFoundError,
 } = require("./dbResultModels");
 
+const wordlist = require("../assets/wordlist");
+
 const { log, logErr } = require("../utils/log");
 
 const PATH_DELIMITER = ":";
@@ -25,6 +27,7 @@ class ProjectDatabase {
       this.lastRead = null; //initializing it for readability reasons. will be overwritten w/ next line
       this.load(true); //will call the read() function on fileHandler and write on lastRead
       this.setupEmptyMaps();
+      this.count = 0;
    }
 
    setupEmptyMaps() {
@@ -47,8 +50,8 @@ class ProjectDatabase {
             `Alias [${value}] mapped to ${this.indexToProject.get(key).absPath}`
          );
       });
-
       log("");
+      log("count: ", this.count);
       log("-------------------");
       let uids = this.uidToIndex.keys();
       let curr = uids.next();
@@ -75,6 +78,7 @@ class ProjectDatabase {
     * @return {Promise<Object>} promise with the data of the saved object
     */
    save() {
+      this.debug();
       return (newDataObj) => {
          return this.fileHandler.write(JSON.stringify(newDataObj)).then((_) => {
             //ensuring that access to lastRead will deal with the new data
@@ -137,6 +141,7 @@ class ProjectDatabase {
             this.aliasesToIndex.set(alias, index)
          );
       });
+      this.count = dataStruct.count;
       return Promise.resolve(dataStruct);
    }
 
@@ -270,6 +275,7 @@ class ProjectDatabase {
       //addProject(..) will add directoryName as alias automatically if the alias is not yet occupied
       const directoryName = absPath.split(this.pathSeparator).pop();
       const uid = this.uid(absPath, directoryName);
+      const newCount = this.count + 1;
 
       if (!Array.isArray(aliases) || aliases.length === 0) {
          aliases = [directoryName];
@@ -296,6 +302,8 @@ class ProjectDatabase {
          if (obj.projects.quickRef[uid]) {
             projectExistedBefore = true;
             aliasesToWrite = [].concat(obj.projects.quickRef[uid].aliases);
+         } else {
+            aliasesToWrite = [].concat(this.getSetOfAutoAliases(this.count));
          }
 
          aliases.forEach((alias) => {
@@ -305,6 +313,8 @@ class ProjectDatabase {
          });
 
          obj.projects.quickRef[uid] = { aliases: aliasesToWrite };
+         log(obj.projects.quickRef);
+         obj.count = newCount;
          return this.parseData(obj)
             .then(this.save())
             .then(() => this.getProjectDetailsByUID(uid))
@@ -316,6 +326,21 @@ class ProjectDatabase {
                }
             });
       });
+   }
+
+   getSetOfAutoAliases(countIndex) {
+      // Make it unique if we exceed the available number of names
+      const countOfAdjectivesToAdd = countIndex / wordlist.names.length;
+      let autoAliasAnimalName = "";
+      for (let index = 0; index <= countOfAdjectivesToAdd; index++) {
+         autoAliasAnimalName + wordlist.adjectives[index] + "-";
+      }
+      autoAliasAnimalName = wordlist.names[countIndex % wordlist.names.length];
+      const autoAliasesToReturn = [countIndex.toString(), autoAliasAnimalName];
+      if (countIndex < wordlist.emojis.length) {
+         autoAliasesToReturn.push(wordlist.emojis[countIndex]);
+      }
+      return autoAliasesToReturn;
    }
 
    /**
@@ -355,7 +380,8 @@ class ProjectDatabase {
                      return !existingAliases.includes(sAlias);
                   });
 
-                  if (obj.projects.quickRef[uid].aliases.length === 0) {
+                  if (obj.projects.quickRef[uid].aliases.length <= 3) {
+                     obj.count = this.count - 1;
                      delete obj.projects.quickRef[uid];
                   }
                }
