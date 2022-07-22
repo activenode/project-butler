@@ -250,6 +250,7 @@ class ProjectDatabase {
    }
 
    findBestMatch(searchString) {
+      log({ searchString });
       //examples:
       // 1. search string: emb
       // -> result: test-emb-test/ from absPath mapping should be matched.
@@ -365,10 +366,8 @@ class ProjectDatabase {
    }
 
    getSetOfAutoAliases(countIndex) {
-      log(countIndex);
       // Make it unique if we exceed the available number of names
       const countOfAdjectivesToAdd = countIndex / wordlist.names.length;
-      log(countOfAdjectivesToAdd);
       let autoAliasAnimalName = "";
       for (let index = 0; index <= countOfAdjectivesToAdd; index++) {
          autoAliasAnimalName + wordlist.adjectives[index] + "-";
