@@ -1,6 +1,19 @@
 const { ProjectOrchestrator } = require("./projectOrchestrator");
 
 describe("ProjectOrchestrator", () => {
+   test("should initialize with given JSON data", () => {
+      const projectOrchestrator = new ProjectOrchestrator(
+         '{"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}'
+      );
+      expect(projectOrchestrator._nextAvailableIndex).toBe(3);
+      expect(projectOrchestrator._projects.length).toBe(3);
+      expect(projectOrchestrator.getProject("f").getAliases()).toEqual([
+         "0",
+         "elk",
+         "f",
+         "o",
+      ]);
+   });
    describe("addProject", () => {
       test("should add a project with the given aliases and path to the list while ignoring already existing aliases and paths", () => {
          const projectOrchestrator = new ProjectOrchestrator();
@@ -163,6 +176,19 @@ describe("ProjectOrchestrator", () => {
          ]);
          expect(source.path).toBe("/three");
          expect(altered.path).toBe("/foobar");
+      });
+   });
+
+   describe("getJsonData", () => {
+      test("should return a JSON string to construct projects from", () => {
+         const projectOrchestrator = new ProjectOrchestrator();
+         projectOrchestrator.addProject("/one", "f", "o", "o");
+         projectOrchestrator.addProject("/two", "b", "a", "r");
+         projectOrchestrator.addProject("/three", "foobar");
+
+         expect(projectOrchestrator.getJsonData()).toBe(
+            '{"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}'
+         );
       });
    });
 

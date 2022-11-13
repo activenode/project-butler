@@ -8,6 +8,17 @@ module.exports.ProjectOrchestrator = class {
       if (!jsonSource) {
          return;
       }
+      const rawData = JSON.parse(jsonSource);
+      this._nextAvailableIndex = rawData.nextAvailableIndex;
+      rawData.projects.forEach((rawProject) => {
+         this._projects.push(
+            new Project(
+               rawProject.index,
+               rawProject.path,
+               ...rawProject.aliases
+            )
+         );
+      });
    }
 
    addProject(path, ...aliases) {
@@ -64,6 +75,19 @@ module.exports.ProjectOrchestrator = class {
          targetProject
       );
       return targetProject;
+   }
+
+   getJsonData() {
+      return JSON.stringify({
+         nextAvailableIndex: this._nextAvailableIndex,
+         projects: this._projects.map((project) => {
+            return {
+               index: project.index,
+               path: project.path,
+               aliases: Array.from(project.aliases),
+            };
+         }),
+      });
    }
 
    _returnAndUpdateNextAvailableIndex() {
