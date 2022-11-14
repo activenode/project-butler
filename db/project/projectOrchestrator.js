@@ -10,15 +10,14 @@ module.exports.ProjectOrchestrator = class {
       }
       const rawData = JSON.parse(jsonSource);
       this._nextAvailableIndex = rawData.nextAvailableIndex;
-      rawData.projects.forEach((rawProject) => {
-         this._projects.push(
+      this._projects = rawData.projects.map(
+         (rawProject) =>
             new Project(
                rawProject.index,
                rawProject.path,
                ...rawProject.aliases
             )
-         );
-      });
+      );
    }
 
    addProject(path, ...aliases) {
