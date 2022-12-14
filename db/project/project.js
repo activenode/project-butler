@@ -38,6 +38,18 @@ module.exports.Project = class {
    }
 
    /**
+    * A method to check whether a part of an identifier can be matched with this very project. Can be used to accomodate a list of "potentially" fitting projects.
+    * @param {string} identifierFragment a fragment of an identifier to test whether it's part of an alias or the path
+    * @returns
+    */
+   includes(identifierFragment) {
+      return (
+         this.path.includes(identifierFragment) ||
+         this.getAliases().some((alias) => alias.includes(identifierFragment))
+      );
+   }
+
+   /**
     * Does not return any auto generated aliases. Merely the value of the field holding the aliases as given by the user.
     * To get an accumulated list of all possible aliases to access this project use "getAliases()" instead.
     */
