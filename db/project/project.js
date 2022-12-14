@@ -38,7 +38,7 @@ module.exports.Project = class {
    }
 
    /**
-    * A method to check whether a part of an identifier can be matched with this very project. Can be used to accomodate a list of "potentially" fitting projects.
+    * A method to check whether a part of an identifier can be matched with this very project. Can be used to generate a list of "potentially" fitting projects.
     * @param {string} identifierFragment a fragment of an identifier to test whether it's part of an alias or the path
     * @returns
     */
