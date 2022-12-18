@@ -192,6 +192,26 @@ describe("ProjectOrchestrator", () => {
       });
    });
 
+   describe("getProjectsByFragment", () => {
+      const projectOrchestrator = new ProjectOrchestrator();
+      projectOrchestrator.addProject("/one", "f", "o", "o");
+      projectOrchestrator.addProject("/two", "b", "a", "r");
+      projectOrchestrator.addProject("/three", "foobar");
+      projectOrchestrator.addProject("/four", "bar");
+
+      test("should return a list of projects if the given fragment can be macthed", () => {
+         expect(projectOrchestrator.getProjectsByFragment("f").length).toBe(3);
+         expect(projectOrchestrator.getProjectsByFragment("fo").length).toBe(2);
+         expect(
+            projectOrchestrator.getProjectsByFragment("foobar").length
+         ).toBe(1);
+      });
+
+      test("should return an empty array if the given fragment can not be matched", () => {
+         expect(projectOrchestrator.getProjectsByFragment("420")).toEqual([]);
+      });
+   });
+
    describe("_updateNextAvailableIndex", () => {
       const projectOrchestrator = new ProjectOrchestrator();
       projectOrchestrator._nextAvailableIndex = 1;

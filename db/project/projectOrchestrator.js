@@ -89,6 +89,17 @@ module.exports.ProjectOrchestrator = class {
       });
    }
 
+   /**
+    * Returns a list of projects matching the given identifier fragment. The fragment can be part of the path, alias or auto-alias. If a sub-string can be matched, the project will be added to the list.
+    * @param {string} identifierFragment A fragment of the identifier to search for
+    * @returns An array with all projects matching the identfier fragment (path, alias or auto generated alias)
+    */
+   getProjectsByFragment(identifierFragment) {
+      return this._projects.filter((project) =>
+         project.includes(identifierFragment)
+      );
+   }
+
    _returnAndUpdateNextAvailableIndex() {
       const currentNextAvailableIndex = this._nextAvailableIndex;
       this._updateNextAvailableIndex();
