@@ -2,22 +2,18 @@ const {
    ProjectCollectionResult,
    InstantProjectResult,
    AliasesAlreadyTakenError,
+   ProjectAddSuccess,
 } = require("./dbResultModels");
 
 const { log, logErr } = require("../utils/log");
 const { ProjectOrchestrator } = require("./project/projectOrchestrator");
 
-class ProjectDatabase {
+module.exports.ProjectDatabase = class {
    /**
     * @param {Object} fileHandler - io object with read/write option
-    * @param {String} pathSeparator - The os-dependend separator
     */
-   constructor(fileHandler, pathSeparator) {
-      if (!pathSeparator) throw new Error("pathSeparator needs to be defined");
-
+   constructor(fileHandler) {
       this.fileHandler = fileHandler;
-      this.pathSeparator = pathSeparator;
-      this._load(); // load from file
    }
 
    async fetchAll() {
@@ -25,31 +21,12 @@ class ProjectDatabase {
       return new ProjectCollectionResult(this._projectOrchestrator.projects);
    }
 
-   async getExactProjectResultByAlias(sAlias) {
-      try {
-         const targetProject = this.getExactProjectResultByIdentifier(sAlias);
-         // single return and make it very clear!
-         return new InstantProjectResult(targetProject);
-      } catch (error) {
-         throw new Error(
-            `Tried to fetch an exact project by a presumably existing alias ${sAlias} but could not find anything`
-         );
-      }
-   }
-
-   getExactProjectResultByAbsoluteDirectory(sAbsoluteDirectoryPath) {
-      const targetProject = this.getExactProjectResultByIdentifier(
-         sAbsoluteDirectoryPath
-      );
-      return targetProject && new ProjectCollectionResult(targetProject);
-   }
-
    async getExactProjectResultByIdentifier(identifier) {
       await this._load();
       const targetProject = this._projectOrchestrator.getProject(identifier);
 
       if (targetProject) {
-         return targetProject;
+         return new InstantProjectResult(targetProject);
       } else {
          throw new Error(
             `Tried to fetch an exact project by a presumably existing identifier ${identifier} but could not find anything`
@@ -57,19 +34,15 @@ class ProjectDatabase {
       }
    }
 
-   findBestMatch(searchString) {
+   async findBestMatch(searchString) {
       log({ searchString });
-      //examples:
-      // 1. search string: emb
-      // -> result: test-emb-test/ from absPath mapping should be matched.
-      // -> if multiple matches are available then list and ask to specify term
-      return this._load().then(() => {
-         try {
-            return this.getExactProjectResultByAlias(searchString);
-         } catch {
-            return this._findNextBestMatch(searchString);
-         }
-      });
+      try {
+         return await this.getExactProjectResultByIdentifier(searchString);
+      } catch {
+         return new ProjectCollectionResult(
+            this._projectOrchestrator.getProjectsByFragment(searchString)
+         );
+      }
    }
 
    /**
@@ -77,7 +50,8 @@ class ProjectDatabase {
     * @param {String} absPath
     * @param {Array<String>} aliases
     */
-   addProject(absPath, aliases) {
+   async addProject(absPath, aliases) {
+      await this._load();
       const addedProject = this._projectOrchestrator.addProject(
          absPath,
          ...aliases
@@ -91,6 +65,7 @@ class ProjectDatabase {
       }
 
       this._save();
+      return new ProjectAddSuccess(addedProject);
    }
 
    removeProject(identfiers) {
@@ -104,11 +79,11 @@ class ProjectDatabase {
    }
 
    /**
-    * Will save all data to the file by simply stringifying it
+    * Will save async ll data to the file by simply stringifying it
     * @return {Promise<Object>} promise with the data of the saved object
     */
-   _save() {
-      return this.fileHandler.write(this._projectOrchestrator.getJsonData());
+   async _save() {
+      await this.fileHandler.write(this._projectOrchestrator.getJsonData());
    }
 
    /**
@@ -117,44 +92,15 @@ class ProjectDatabase {
     * @param {Boolean} bForceFileLoad - if true then a file io will be enforced
     * @return {Promise<String>}
     */
-   _load() {
+   async _load() {
       if (this._projectOrchestrator) {
          return;
       }
-      this.fileHandler.read().then((contents) => this._parseData(contents));
+      let rawData;
+      try {
+         rawData = await this.fileHandler.read();
+      } catch (error) {}
+
+      this._projectOrchestrator = new ProjectOrchestrator(rawData);
    }
-
-   /**
-    * parseData will make sure that the project object
-    * is mapped to the temporary storage and easily accessible.
-    * @param {Object} dataStruct
-    */
-   _parseData(dataStruct) {
-      this._projectOrchestrator = new ProjectOrchestrator(dataStruct);
-   }
-
-   /**
-    * Will search for a best match. E.g. `cl` would match `cli` and return an exact
-    * but if there is `cli` and `cla` then it would just return Proposals
-    * @param {string} searchString
-    */
-   _findNextBestMatch(searchString) {
-      return this.fetchAll().then((allProjects) => {
-         if (!(allProjects instanceof ProjectCollectionResult)) {
-            logErr(
-               `Tried to fetch all projects to find the next best match but failed doing so cause the result was not a collection`
-            );
-            return [];
-         }
-
-         const matchedProjects =
-            this._projectOrchestrator.includes(searchString);
-
-         return new ProjectCollectionResult(matchedProjects);
-      });
-   }
-}
-
-module.exports = function hydrateDatabase(fileHandler, pathSeparator) {
-   return new ProjectDatabase(fileHandler, pathSeparator);
 };

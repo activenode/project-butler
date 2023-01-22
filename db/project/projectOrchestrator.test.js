@@ -106,6 +106,16 @@ describe("ProjectOrchestrator", () => {
             "bar",
          ]);
       });
+      test("should return the project if it can be identified by its auto alias", () => {
+         const projectOrchestrator = new ProjectOrchestrator();
+         projectOrchestrator.addProject("/one", "foo");
+
+         expect(projectOrchestrator.getProject("0").getAliases()).toEqual([
+            "0",
+            "elk",
+            "foo",
+         ]);
+      });
    });
 
    describe("updateProject", () => {

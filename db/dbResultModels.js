@@ -1,4 +1,4 @@
-const { Project } = require("./project");
+const { Project } = require("./project/project");
 
 class ExpectedError extends Error {
    constructor(message) {

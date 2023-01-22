@@ -1,10 +1,9 @@
 const { Project } = require("./project");
 
 module.exports.ProjectOrchestrator = class {
-   _nextAvailableIndex = 0;
-   _projects = [];
-
    constructor(jsonSource) {
+      this._nextAvailableIndex = 0;
+      this._projects = [];
       if (!jsonSource) {
          return;
       }
@@ -52,7 +51,7 @@ module.exports.ProjectOrchestrator = class {
 
    getProject(identifier) {
       return this._projects.find((project) =>
-         [...project.aliases, project.path].includes(identifier)
+         [...project.getAliases(), project.path].includes(identifier)
       );
    }
 
@@ -114,5 +113,9 @@ module.exports.ProjectOrchestrator = class {
             (project) => project.index === this._nextAvailableIndex
          )
       );
+   }
+
+   get projects() {
+      return this._projects;
    }
 };
