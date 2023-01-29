@@ -1,12 +1,15 @@
 const io = require("../io"),
    { ProjectDatabase } = require("./database");
 
+const fileHandlerMock = {
+   read: async () =>
+      '{"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}',
+   write: async () => console.log("mock written"),
+};
+
 describe("ProjectDatabase", () => {
+   const databaseConnection = new ProjectDatabase(fileHandlerMock);
    describe("_load", () => {
-      const databaseFile = io.open(
-         io.resolveRelativePath("./db/storage-fixture.json")
-      );
-      const databaseConnection = new ProjectDatabase(databaseFile);
       test("should load correctly from file", async () => {
          await databaseConnection._load();
 
@@ -23,6 +26,7 @@ describe("ProjectDatabase", () => {
          await databaseConnection._load();
 
          expect(parseDataSpy).not.toHaveBeenCalled();
+         parseDataSpy.mockClear();
       });
       test("should load with an empty Orchestrator when file can not be found", async () => {
          // This is when the app is initialized for the first time (no file is present in that case)
@@ -38,10 +42,6 @@ describe("ProjectDatabase", () => {
    });
    describe("_save", () => {
       test("should write the current state to a file", async () => {
-         const databaseFile = io.open(
-            io.resolveRelativePath("./db/storage-fixture.json")
-         );
-         const databaseConnection = new ProjectDatabase(databaseFile);
          const writeFileSpy = jest.spyOn(
             databaseConnection.fileHandler,
             "write"
@@ -50,15 +50,11 @@ describe("ProjectDatabase", () => {
          await databaseConnection._save();
 
          expect(writeFileSpy).toHaveBeenCalledTimes(1);
+         writeFileSpy.mockClear();
       });
    });
    describe("fetchAll", () => {
       test("should return a ProjectCollection with the stored data", async () => {
-         const databaseFile = io.open(
-            io.resolveRelativePath("./db/storage-fixture.json")
-         );
-         const databaseConnection = new ProjectDatabase(databaseFile);
-
          const result = await databaseConnection.fetchAll();
          expect(result.projects.length).toBe(3);
       });
@@ -73,11 +69,6 @@ describe("ProjectDatabase", () => {
    });
    describe("getExactProjectResultByIdentifier", () => {
       test("should return exact project result", async () => {
-         const databaseFile = io.open(
-            io.resolveRelativePath("./db/storage-fixture.json")
-         );
-         const databaseConnection = new ProjectDatabase(databaseFile);
-
          const getByPath =
             await databaseConnection.getExactProjectResultByIdentifier("/one");
          expect(getByPath.project).toBeDefined();
@@ -93,11 +84,6 @@ describe("ProjectDatabase", () => {
          expect(getByAutoAlias.project).toBeDefined();
       });
       test("should throw if identifier can not be matched", async () => {
-         const databaseFile = io.open(
-            io.resolveRelativePath("./db/storage-fixture.json")
-         );
-         const databaseConnection = new ProjectDatabase(databaseFile);
-
          try {
             await databaseConnection.getExactProjectResultByIdentifier(
                "/very/wrong"
@@ -110,10 +96,6 @@ describe("ProjectDatabase", () => {
       });
    });
    describe("findBestMatch", () => {
-      const databaseFile = io.open(
-         io.resolveRelativePath("./db/storage-fixture.json")
-      );
-      const databaseConnection = new ProjectDatabase(databaseFile);
       test("should return exact match if possible", async () => {
          const result = await databaseConnection.findBestMatch("foobar");
          expect(result.project).toBeDefined();
@@ -124,8 +106,25 @@ describe("ProjectDatabase", () => {
       });
    });
    describe("addProject", () => {
-      // => already taken error
-      // => project suceess
-      // Spy on io write
+      test("should return an Error if any of the given aliasas is already in use", async () => {
+         const result = await databaseConnection.addProject("/", "1234", "f");
+         expect(result.message).toBe("Aliases are taken");
+      });
+      test("should return an Error if the given path is already in use", async () => {
+         const result = await databaseConnection.addProject("/one", "1234");
+         expect(result.message).toBe("Aliases are taken");
+      });
+      test("should add a project if none of the identifiers are in use yet", async () => {
+         const writeFileSpy = jest.spyOn(
+            databaseConnection.fileHandler,
+            "write"
+         );
+         const result = await databaseConnection.addProject("/", "1234");
+
+         expect(result._projectDetails).toBeDefined;
+         expect(writeFileSpy).toHaveBeenCalledTimes(1);
+
+         writeFileSpy.mockClear();
+      });
    });
 });

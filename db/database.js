@@ -50,7 +50,7 @@ module.exports.ProjectDatabase = class {
     * @param {String} absPath
     * @param {Array<String>} aliases
     */
-   async addProject(absPath, aliases) {
+   async addProject(absPath, ...aliases) {
       await this._load();
       const addedProject = this._projectOrchestrator.addProject(
          absPath,
