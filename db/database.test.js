@@ -4,7 +4,7 @@ const io = require("../io"),
 const fileHandlerMock = {
    read: async () =>
       '{"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}',
-   write: async () => console.log("mock written"),
+   write: async (payload) => console.log({ payload }),
 };
 
 describe("ProjectDatabase", () => {
@@ -122,6 +122,26 @@ describe("ProjectDatabase", () => {
          const result = await databaseConnection.addProject("/", "1234");
 
          expect(result._projectDetails).toBeDefined;
+         expect(writeFileSpy).toHaveBeenCalledTimes(1);
+
+         writeFileSpy.mockClear();
+      });
+   });
+   describe("removeProject", () => {
+      test("should remove projects, save the state and return a collection of removed projects", async () => {
+         const writeFileSpy = jest.spyOn(
+            databaseConnection.fileHandler,
+            "write"
+         );
+         const result = await databaseConnection.removeProject(
+            0,
+            1,
+            "foobar",
+            "non-existent"
+         );
+
+         expect(result.projects).toBeDefined();
+         expect(result.projects.length).toBe(3);
          expect(writeFileSpy).toHaveBeenCalledTimes(1);
 
          writeFileSpy.mockClear();

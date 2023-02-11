@@ -64,17 +64,19 @@ module.exports.ProjectDatabase = class {
          });
       }
 
-      this._save();
+      await this._save();
       return new ProjectAddSuccess(addedProject);
    }
 
-   removeProject(identfiers) {
+   async removeProject(...identfiers) {
       const deletedProjects = new ProjectCollectionResult(
-         identfiers.map((alias) =>
-            this._projectOrchestrator.removeProject(alias)
-         )
+         identfiers
+            .map((alias) =>
+               this._projectOrchestrator.removeProject(alias.toString())
+            )
+            .filter((project) => project)
       );
-      this._save();
+      await this._save();
       return deletedProjects;
    }
 
