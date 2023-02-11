@@ -1,6 +1,6 @@
 const io = require("../io"),
    config = require("../config"),
-   ProjectDatabase = require("./database");
+   { ProjectDatabase } = require("./database");
 
 module.exports = (function () {
    let _databaseConnection;
