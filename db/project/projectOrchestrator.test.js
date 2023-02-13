@@ -272,4 +272,45 @@ describe("ProjectOrchestrator", () => {
          expect(projectOrchestrator._nextAvailableIndex).toBe(2);
       });
    });
+
+   describe("_getValidJson", () => {
+      const projectOrchestrator = new ProjectOrchestrator();
+      test("should return undefined if a falsey value is given", () => {
+         expect(projectOrchestrator._getValidJson(false)).toBeUndefined();
+         expect(projectOrchestrator._getValidJson(0)).toBeUndefined();
+         expect(projectOrchestrator._getValidJson("")).toBeUndefined();
+         expect(projectOrchestrator._getValidJson(null)).toBeUndefined();
+         expect(projectOrchestrator._getValidJson(undefined)).toBeUndefined();
+         expect(projectOrchestrator._getValidJson(NaN)).toBeUndefined();
+      });
+      test("should return undefined if invalid JSON is given", () => {
+         expect(projectOrchestrator._getValidJson("foobar")).toBeUndefined();
+         expect(
+            projectOrchestrator._getValidJson(
+               '"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}'
+            )
+         ).toBeUndefined();
+         expect(
+            projectOrchestrator._getValidJson({
+               complex: {
+                  foo: "bar",
+               },
+            })
+         ).toBeUndefined();
+      });
+      test("should return parsed JSON if valid JSON is given", () => {
+         expect(
+            projectOrchestrator._getValidJson(
+               '{"nextAvailableIndex":3,"projects":[{"index":0,"path":"/one","aliases":["f","o"]},{"index":1,"path":"/two","aliases":["b","a","r"]},{"index":2,"path":"/three","aliases":["foobar"]}]}'
+            )
+         ).toStrictEqual({
+            nextAvailableIndex: 3,
+            projects: [
+               { aliases: ["f", "o"], index: 0, path: "/one" },
+               { aliases: ["b", "a", "r"], index: 1, path: "/two" },
+               { aliases: ["foobar"], index: 2, path: "/three" },
+            ],
+         });
+      });
+   });
 });

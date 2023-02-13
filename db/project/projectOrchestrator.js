@@ -4,10 +4,10 @@ module.exports.ProjectOrchestrator = class {
    constructor(jsonSource) {
       this._nextAvailableIndex = 0;
       this._projects = [];
-      if (!jsonSource) {
+      const rawData = this._getValidJson(jsonSource);
+      if (!rawData) {
          return;
       }
-      const rawData = JSON.parse(jsonSource);
       this._nextAvailableIndex = rawData.nextAvailableIndex;
       this._projects = rawData.projects.map(
          (rawProject) =>
@@ -97,6 +97,22 @@ module.exports.ProjectOrchestrator = class {
       return this._projects.filter((project) =>
          project.includes(identifierFragment)
       );
+   }
+
+   /**
+    * Tries to parse a JSON sourc and returns `undefined` if it is not possible
+    * @param {*} jsonSource The source to validate and return
+    * @returns Either `undefined` if the given source is not valid JSON or the parsed JSON object
+    */
+   _getValidJson(jsonSource) {
+      if (!jsonSource) {
+         return;
+      }
+      try {
+         return JSON.parse(jsonSource);
+      } catch (e) {
+         return;
+      }
    }
 
    _returnAndUpdateNextAvailableIndex() {
