@@ -19,7 +19,7 @@ module.exports = function (cli, db) {
    cli.command("add [aliases...]")
       .option("-d, --dir [path]", "Directory to add. Default: CWD")
       .description("Adds current directory.")
-      .action((aliases, cmd) => {
+      .action(async (aliases, cmd) => {
          const absPath = path.resolve(cmd.dir || getCWD());
 
          try {
@@ -39,7 +39,7 @@ module.exports = function (cli, db) {
 
          const dirname = path.basename(absPath);
 
-         const dbResult = db.addProject(absPath, aliases);
+         const dbResult = await db.addProject(absPath, aliases);
 
          try {
             log("");
@@ -57,9 +57,7 @@ module.exports = function (cli, db) {
                   ...dbResult.projectDetails.getAliases(),
                ]);
             } else if (dbResult instanceof AliasesAlreadyTakenError) {
-               log(
-                  `You wanted to map ${absPath} with ${dbResult.project.getAliases()}`
-               );
+               log(`You wanted to map ${absPath} with ${dbResult.project}`);
                logAliasesTakenMessage(dbResult.aliasesTaken);
             } else {
                logErr(`${LOG_TEXTS.UNKNOWN_ERROR} - whilst adding a project`);
