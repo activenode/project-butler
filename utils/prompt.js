@@ -26,10 +26,9 @@ function Confirm({ message, initial }) {
 
 module.exports.AutoCompleteProjects = function (projectsArray = [], opts = {}) {
    const longestDirectoryNameLength = projectsArray.reduce(
-      (longestInt, { directoryName }) => {
-         return longestInt > directoryName.length
-            ? longestInt
-            : directoryName.length;
+      (longestInt, { path }) => {
+         console.log({ longestInt, path });
+         return longestInt > path.length ? longestInt : path.length;
       },
       0
    );
@@ -37,12 +36,13 @@ module.exports.AutoCompleteProjects = function (projectsArray = [], opts = {}) {
    return AutoComplete({
       name: "project",
       message: "Choose a project (type for autocompletion)",
-      choices: projectsArray.map(({ absPath, directoryName, aliases }) => {
+      choices: projectsArray.map((project) => {
          const homeDirRx = new RegExp("^" + config.homedir, "i");
+         const absPath = project.path;
+         const aliases = project.getAliases();
          return {
             value: {
                absPath,
-               directoryName,
                aliases,
                toString: function () {
                   return absPath; // we need the toString method since enquirer will call value.toString()
