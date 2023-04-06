@@ -21,7 +21,7 @@ module.exports = function (cli, db) {
          const absPath = path.resolve(getCWD());
 
          if (isEmpty(aliases)) {
-            db.removeByDirectory(absPath).then((result) => {
+            db.removeProject(absPath).then((result) => {
                if (result === "NOT_STORED") {
                   log(
                      `${colors.red(
@@ -37,7 +37,7 @@ module.exports = function (cli, db) {
                }
             });
          } else {
-            db.removeByAliases(aliases, cmd.all).then((_) => {
+            db.removeProject(aliases, cmd.all).then((_) => {
                if (_ instanceof AliasesNotFoundError) {
                   logErr(LOG_TEXTS.ALIASES_NOT_FOUND_ERROR);
                } else if (_ instanceof ProjectCollectionResult) {

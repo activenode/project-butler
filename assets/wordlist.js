@@ -1,0 +1,26 @@
+module.exports = {
+   names: [
+      "elk",
+      "ant",
+      "cow",
+      "pig",
+      "dog",
+      "cat",
+      "bee",
+      "eel",
+      "owl",
+      "fox",
+   ],
+   adjectives: [
+      "big",
+      "fun",
+      "dry",
+      "icy",
+      "mad",
+      "wet",
+      "rad",
+      "pro",
+      "hot",
+      "hip",
+   ],
+};

@@ -19,7 +19,7 @@ module.exports = function (cli, db) {
    cli.command("add [aliases...]")
       .option("-d, --dir [path]", "Directory to add. Default: CWD")
       .description("Adds current directory.")
-      .action((aliases, cmd) => {
+      .action(async (aliases, cmd) => {
          const absPath = path.resolve(cmd.dir || getCWD());
 
          try {
@@ -39,43 +39,31 @@ module.exports = function (cli, db) {
 
          const dirname = path.basename(absPath);
 
-         db.addProject(absPath, aliases)
-            .then((dbResult) => {
+         const dbResult = await db.addProject(absPath, aliases);
+
+         try {
+            log("");
+            if (dbResult instanceof ProjectAddSuccess) {
+               log(
+                  `😌  Successfully added the project ${colors.bold(dirname)} `
+               );
                log("");
-               if (dbResult instanceof ProjectAddSuccess) {
-                  log(
-                     `😌  Successfully added the project ${colors.bold(
-                        dirname
-                     )} `
-                  );
-                  log("");
-                  logProjectAliases(
-                     dbResult.projectDetails.absPath,
-                     dbResult.projectDetails.aliases
-                  );
-               } else if (dbResult instanceof ProjectUpdateSuccess) {
-                  log(" 👋  Successfully updated the project \n");
-                  logProjectAliases(
-                     dbResult.projectDetails.absPath,
-                     dbResult.projectDetails.aliases
-                  );
-               } else if (dbResult instanceof AliasesAlreadyTakenError) {
-                  log(
-                     `You wanted to map ${absPath} with ${dbResult.project.aliases}`
-                  );
-                  logAliasesTakenMessage(dbResult.aliasesTaken);
-               } else {
-                  throw new Error(LOG_TEXTS.UNKOWN_ERROR);
-               }
-            })
-            .catch((error) => {
-               if (error instanceof Error) {
-                  logErr(error);
-               } else {
-                  logErr(
-                     `${LOG_TEXTS.UNKNOWN_ERROR} - whilst adding a project`
-                  );
-               }
-            });
+               logProjectAliases(dbResult.projectDetails.path, [
+                  ...dbResult.projectDetails.getAliases(),
+               ]);
+            } else if (dbResult instanceof ProjectUpdateSuccess) {
+               log(" 👋  Successfully updated the project \n");
+               logProjectAliases(dbResult.projectDetails.path, [
+                  ...dbResult.projectDetails.getAliases(),
+               ]);
+            } else if (dbResult instanceof AliasesAlreadyTakenError) {
+               log(`You wanted to map ${absPath} with ${dbResult.project}`);
+               logAliasesTakenMessage(dbResult.aliasesTaken);
+            } else {
+               logErr(`${LOG_TEXTS.UNKNOWN_ERROR} - whilst adding a project`);
+            }
+         } catch (error) {
+            logErr(error);
+         }
       });
 };

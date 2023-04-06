@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 /**
  * A function that provides a read, write and close function for a given filepath
@@ -26,6 +27,11 @@ function readWriteHelper(filePath) {
    };
 }
 
+function resolveRelativePath(relativePath) {
+   return path.resolve(__dirname, relativePath);
+}
+
 module.exports = {
    open: readWriteHelper,
+   resolveRelativePath,
 };

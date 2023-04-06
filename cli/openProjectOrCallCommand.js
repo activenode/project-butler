@@ -66,7 +66,7 @@ const openProjectOrCallAction = (
    // we might consider at a later point to genericify the tool (npm, yarn, whatever)
    // but for now npm should be okay
    return db
-      .getExactProjectResultByAbsoluteDirectory(currentWorkingDirectoryAbsPath)
+      .getExactProjectResultByIdentifier(currentWorkingDirectoryAbsPath)
       .then((projectResult) => {
          let bCommandCalled = false;
          if (projectResult) {
@@ -75,9 +75,8 @@ const openProjectOrCallAction = (
             const packageJson = parsePackageJson(
                `${currentWorkingDirectoryAbsPath}/package.json`
             );
-            const potentialNpmScriptToExecute = packageJson._getScript(
-               projectNameOrAction
-            );
+            const potentialNpmScriptToExecute =
+               packageJson._getScript(projectNameOrAction);
 
             if (potentialNpmScriptToExecute) {
                bCommandCalled = true;

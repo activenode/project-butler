@@ -10,7 +10,8 @@
    "bin": "./bin/project-butler",
    "scripts": {
       "start": "echo 'Ran the npm start script'",
-      "postinstall": "npx nexe bin.js -n p --fakeArgv true -t 10.13.0 -o bin/p && rm -f bin/project-butler && mv bin/p bin/project-butler && echo '---' && bin/project-butler --install"
+      "postinstall": "npx nexe bin.js -n p --fakeArgv true -t 10.13.0 -o bin/p && rm -f bin/project-butler && mv bin/p bin/project-butler && echo '---' && bin/project-butler --install",
+      "test": "jest"
    },
    "author": "David Lorenz <info@activenode.de>",
    "license": "MIT",
@@ -25,5 +26,7 @@
    "engines": {
       "node": ">=10.9.0"
    },
-   "devDependencies": {}
+   "devDependencies": {
+      "jest": "^28.1.3"
+   }
 }

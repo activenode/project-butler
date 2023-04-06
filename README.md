@@ -50,3 +50,11 @@ You are in your project directory and you call `p start` . If your package.json 
 # Contribution
 
 There is no official contribution guide yet but feel free to get in touch.
+
+# temp: todo tests (remove before merging :))
+
+1. Adding projects
+2. Removing projects
+3. Executing cd by usuing auto generated alias
+4. Removing auto generated aliases (count?)
+5. Adding more than 18 projects - what happens to auto-generated aliases?

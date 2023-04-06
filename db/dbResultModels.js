@@ -1,4 +1,4 @@
-const colors = require("colors/safe");
+const { Project } = require("./project/project");
 
 class ExpectedError extends Error {
    constructor(message) {
@@ -65,7 +65,7 @@ class ProjectCollectionResult {
 
 class InstantProjectResult {
    constructor(project) {
-      if ("absPath" in project) {
+      if (project instanceof Project) {
          this._project = project;
       } else if (
          (project instanceof ProjectCollectionResult ||

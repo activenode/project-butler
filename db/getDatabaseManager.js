@@ -1,7 +1,6 @@
 const io = require("../io"),
-   { sep: separator } = require("path"),
    config = require("../config"),
-   hydrateDatabase = require("./database");
+   { ProjectDatabase } = require("./database");
 
 module.exports = (function () {
    let _databaseConnection;
@@ -12,7 +11,7 @@ module.exports = (function () {
             config.database.dbManagerFilePathAbsolute
          );
 
-         _databaseConnection = hydrateDatabase(databaseFile, separator);
+         _databaseConnection = new ProjectDatabase(databaseFile);
       }
 
       return _databaseConnection;
