@@ -69,10 +69,13 @@ module.exports.ProjectDatabase = class {
    }
 
    async removeProject(...identfiers) {
+      await this._load();
       const deletedProjects = new ProjectCollectionResult(
          identfiers
-            .map((alias) =>
-               this._projectOrchestrator.removeProject(alias.toString())
+            .map(
+               (alias) =>
+                  alias &&
+                  this._projectOrchestrator.removeProject(alias.toString())
             )
             .filter((project) => project)
       );
