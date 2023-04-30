@@ -19,7 +19,7 @@
       "colors": "^1.4.0",
       "commander": "^2.9.0",
       "enquirer": "^2.3.6",
-      "nexe": "^3.3.7",
+      "nexe": "^4.0.0-rc.2",
       "os-homedir": "^1.0.2"
    },
    "engines": {
