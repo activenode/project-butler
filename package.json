@@ -15,7 +15,7 @@
    "author": "David Lorenz <info@activenode.de>",
    "license": "MIT",
    "dependencies": {
-      "cli-columns": "^3.1.2",
+      "cli-columns": "^4.0.0",
       "colors": "^1.4.0",
       "commander": "^2.9.0",
       "enquirer": "^2.3.6",
